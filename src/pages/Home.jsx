@@ -3,25 +3,32 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <section>
-      <div className="card">
-        <h2>ברוכים הבאים ל-חת"ת היומי</h2>
+      <div className="hero-card card">
+        <span className="pill">התחל היום</span>
+        <h2>חת"ת יומי במראה חדש</h2>
         <p>
-          כאן אפשר לעקוב אחרי לימוד יומי של חומש, תהילים ותניא, לצבור ניקוד על רצף
-          יומי ולשחק בחידון פרשת השבוע.
+          כל יום חומש, תהילים ותניא במקום אחד. צבור ניקוד על רצף, שאלון פרשה, ותזכורות שיעזרו לך לא לוותר.
         </p>
+        <div className="hero-actions">
+          <Link to="/daily" className="primary">פתח את לוח היומי</Link>
+          <Link to="/quiz" className="secondary">חידון פרשה</Link>
+        </div>
       </div>
 
-      <div className="stats-grid">
-        <article className="card">
-          <h3>לוח יומי</h3>
-          <p>צפה בתוכן היומי לפי היום בחודש עם חומש, תהילים ותניא.</p>
-          <Link to="/daily" className="primary">פתח את לוח היומי</Link>
+      <div className="features-grid">
+        <article className="feature-card card">
+          <h3>לוח יום מעוצב</h3>
+          <p>כל יום בחודש מוצג עם פרטי לימוד ברורים וחוויית מעבר נעימה.</p>
         </article>
 
-        <article className="card">
+        <article className="feature-card card">
+          <h3>ניקוד ורצף</h3>
+          <p>מקבל ניקוד על כל יום שמסומן כהושלם, כדי לשמור מוטיבציה.</p>
+        </article>
+
+        <article className="feature-card card">
           <h3>חידון פרשה</h3>
-          <p>שאלות טריוויה על פרשת השבוע עם ניקוד ורמות קושי.</p>
-          <Link to="/quiz" className="primary">עבור לחידון</Link>
+          <p>שאלות איכותיות ברמות קושי שונות כדי לעזור לזכור את הפרשה.</p>
         </article>
       </div>
     </section>

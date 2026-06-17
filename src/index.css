@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #0b1520;
+  background: #08101e;
   color: #f7f4ef;
   line-height: 1.6;
 }
@@ -13,11 +13,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #2b3d5b 0%, #0b1520 65%);
+  background: radial-gradient(circle at top, #2b3d5b 0%, #08101e 58%, #02060d 100%);
 }
 
 a {
-  color: #ffd86f;
+  color: inherit;
   text-decoration: none;
 }
 
@@ -34,34 +34,59 @@ select {
 }
 
 .app-header {
-  padding: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 28px 32px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 24px;
+  background: linear-gradient(180deg, rgba(9, 20, 35, 0.96), rgba(6, 11, 20, 0.92));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-group {
+  max-width: 720px;
+}
+
+.brand-badge {
+  display: inline-block;
+  background: rgba(255, 189, 75, 0.18);
+  color: #ffe5ba;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  margin-bottom: 14px;
 }
 
 .app-header h1 {
-  margin: 0 0 6px;
-  font-size: clamp(2rem, 2.5vw, 3rem);
+  margin: 0 0 10px;
+  font-size: clamp(2.2rem, 3vw, 3.5rem);
+  letter-spacing: 0.03em;
 }
 
 .app-header p {
   margin: 0;
   color: #c5d1e3;
+  max-width: 600px;
 }
 
 .app-nav {
   display: flex;
-  gap: 16px;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .app-nav a {
-  padding: 10px 16px;
-  border-radius: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.app-nav a:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .app-nav a.active {
@@ -70,71 +95,223 @@ select {
 }
 
 .app-content {
-  padding: 24px;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 24px;
+  border-radius: 32px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.16);
+  padding: 28px;
   margin-bottom: 24px;
 }
 
-.card h2 {
+.hero-card {
+  display: grid;
+  gap: 20px;
+  padding: 36px;
+  background: linear-gradient(135deg, rgba(44, 68, 110, 0.95), rgba(8, 16, 30, 0.96));
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.feature-card {
+  min-height: 170px;
+}
+
+.page-intro-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.page-intro-card h2,
+.card h2,
+.card h3 {
   margin-top: 0;
 }
 
-.stats-grid {
+.stats-grid,
+.features-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-.highlight {
-  background: rgba(255, 189, 75, 0.18);
-  color: #ffe5ba;
-  padding: 8px 12px;
-  border-radius: 14px;
+.daily-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1.4fr 0.8fr;
+}
+
+.content-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.content-list div {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 16px;
+  border-radius: 18px;
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: #c5d1e3;
+}
+
+.summary-badge {
+  display: grid;
+  gap: 10px;
+  align-items: start;
+  text-align: right;
+}
+
+.summary-badge strong {
   display: inline-block;
+  font-size: 1.2rem;
 }
 
-.control-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 16px;
+.highlight,
+.pill {
+  display: inline-block;
+  background: rgba(255, 189, 75, 0.16);
+  color: #ffe5ba;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+
+.text-soft {
+  color: #bac9dc;
+}
+
+button.primary,
+button.secondary {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+button.primary:hover,
+button.secondary:hover {
+  transform: translateY(-2px);
 }
 
 button.primary {
   background: linear-gradient(135deg, #ffbd4b, #ff8c71);
   color: #161616;
   border: none;
-  border-radius: 14px;
-  padding: 12px 20px;
+  border-radius: 16px;
+  padding: 14px 24px;
   cursor: pointer;
+  box-shadow: 0 16px 30px rgba(255, 189, 75, 0.24);
 }
 
 button.secondary {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 14px 24px;
+  cursor: pointer;
 }
 
 select,
 input[type='number'] {
-  padding: 10px 14px;
-  border-radius: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
 }
 
 footer.app-footer {
-  padding: 18px 24px;
+  padding: 22px 32px;
   text-align: center;
-  color: #9aa6b8;
+  color: #8f9eb7;
+}
+
+.small-label {
+  color: #bac9dc;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.progress-block {
+  margin-bottom: 18px;
+}
+
+.next-goal {
+  margin-top: 18px;
+  color: #c5d1e3;
+}
+
+.quiz-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.quiz-card {
+  transition: transform 0.18s ease;
+}
+
+.quiz-card:hover {
+  transform: translateY(-2px);
+}
+
+.quiz-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.quiz-feedback {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+
+.quiz-feedback.correct {
+  background: rgba(110, 175, 94, 0.16);
+  color: #dff4d6;
+}
+
+.quiz-feedback.wrong,
+.quiz-feedback.missing {
+  background: rgba(220, 90, 90, 0.16);
+  color: #ffd3d3;
+}
+
+.quiz-footer-card {
+  text-align: center;
+}
+
+.result-block {
+  margin-top: 18px;
+  color: #f3f2ef;
+}
+
+@media (max-width: 900px) {
+  .daily-grid,
+  .stats-grid,
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
@@ -145,6 +322,5 @@ footer.app-footer {
 
   .app-nav {
     justify-content: center;
-    flex-wrap: wrap;
   }
 }

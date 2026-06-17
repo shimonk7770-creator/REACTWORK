@@ -7,14 +7,16 @@ function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div>
-          <h1>חת"ת יומי</h1>
-          <p>חומש, תהילים, תניא ותוכן חידון פרשה</p>
+        <div className="brand-group">
+          <span className="brand-badge">חת"ת יומי</span>
+          <h1>למוטיבציה יומיומית בחומש, תהילים ותניא</h1>
+          <p>עוקבים אחרי היום הנוכחי, צוברים ניקוד ונשארים ברצף עם עיצוב מודרני בעברית.</p>
         </div>
+
         <nav className="app-nav">
-          <NavLink to="/" end>בית</NavLink>
-          <NavLink to="/daily">לוח יומי</NavLink>
-          <NavLink to="/quiz">חידון פרשה</NavLink>
+          <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>בית</NavLink>
+          <NavLink to="/daily" className={({ isActive }) => (isActive ? 'active' : '')}>לוח יומי</NavLink>
+          <NavLink to="/quiz" className={({ isActive }) => (isActive ? 'active' : '')}>חידון פרשה</NavLink>
         </nav>
       </header>
 
@@ -27,7 +29,7 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <p>מפותח עבור פרויקט חת"ת יומי - שמרנו כל שלב ב-Git</p>
+        <p>שמירה מקומית ב-localStorage, ניהול רצף וניקוד, ושמירה קבועה ב-Git.</p>
       </footer>
     </div>
   );

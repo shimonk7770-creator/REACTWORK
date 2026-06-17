@@ -30,6 +30,7 @@ function Quiz() {
   const [score, setScore] = useState(0);
 
   const selectOption = (questionId, option) => {
+    if (submitted) return;
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
   };
 
@@ -44,38 +45,59 @@ function Quiz() {
     setSubmitted(true);
   };
 
+  const getStatus = (question) => {
+    if (!submitted) return '';
+    if (answers[question.id] === question.answer) return 'correct';
+    if (!answers[question.id]) return 'missing';
+    return 'wrong';
+  };
+
   return (
     <section>
-      <div className="card">
+      <div className="card page-intro-card">
+        <span className="pill">חידון</span>
         <h2>חידון פרשת השבוע</h2>
-        <p>ענה על השאלות ותראה את הניקוד לפי רמת הקושי.</p>
+        <p>ענה על השאלות ולמד את המסורת בדרך מהנה. כל שאלה מתומחרת לפי רמת הקושי.</p>
       </div>
 
-      {questions.map((question) => (
-        <div className="card" key={question.id}>
-          <h3>{question.question}</h3>
-          <p className="highlight">רמת קושי: {question.difficulty}</p>
-          <div className="control-row">
-            {question.options.map((option) => (
-              <button
-                key={option}
-                className={answers[question.id] === option ? 'primary' : 'secondary'}
-                type="button"
-                onClick={() => selectOption(question.id, option)}
-              >
-                {option}
-              </button>
-            ))}
+      <div className="quiz-stack">
+        {questions.map((question) => (
+          <div key={question.id} className={`card quiz-card ${getStatus(question)}`}>
+            <div className="quiz-card-header">
+              <h3>{question.question}</h3>
+              <span className="pill">{question.difficulty}</span>
+            </div>
+            <div className="control-row">
+              {question.options.map((option) => (
+                <button
+                  key={option}
+                  className={answers[question.id] === option ? 'primary' : 'secondary'}
+                  type="button"
+                  onClick={() => selectOption(question.id, option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            {submitted && (
+              <p className={`quiz-feedback ${getStatus(question)}`}>
+                {getStatus(question) === 'correct'
+                  ? 'נכון! מדהים.'
+                  : getStatus(question) === 'wrong'
+                  ? `לא נכון. התשובה היא ${question.answer}`
+                  : 'לא ענית על השאלה.'}
+              </p>
+            )}
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
-      <div className="card">
+      <div className="card quiz-footer-card">
         <button className="primary" onClick={submit}>שלח תשובות</button>
         {submitted && (
-          <div style={{ marginTop: '16px' }}>
+          <div className="result-block">
             <p>הניקוד שלך: <strong>{score}</strong></p>
-            <p>זמן להמשיך ללמוד ולהעשיר את הידע.</p>
+            <p>{score >= 30 ? 'כל הכבוד! ברצף על הידע.' : 'עוד קצת ויעדית לרמה הבאה.'}</p>
           </div>
         )}
       </div>
