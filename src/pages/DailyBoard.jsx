@@ -1,19 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import { chumashByDayOfWeek, dailyContent } from '../data/dailyContent.js';
+import { getCurrentParasha } from '../data/parashaData.js';
 
 const STORAGE_KEY = 'reactwork-daily-state';
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
+const MILESTONES = [
+  { days: 7,  bonus: 50,  emoji: '🎉', label: 'שבוע שלם!'         },
+  { days: 14, bonus: 100, emoji: '⭐', label: 'שבועיים ברצף!'      },
+  { days: 21, bonus: 150, emoji: '🌟', label: 'שלושה שבועות!'      },
+  { days: 30, bonus: 200, emoji: '🏆', label: 'חודש שלם!'          },
+];
+
 function DailyBoard() {
   const now = new Date();
-  const todayDate = now.getDate();
-  const todayDayOfWeek = now.getDay(); // 0 = ראשון … 6 = שבת
+  const todayDate    = now.getDate();
+  const todayDayOfWeek = now.getDay();
 
-  const [selectedDay, setSelectedDay] = useState(todayDate);
-  const [completedDays, setCompletedDays] = useState(new Set());
-  const [streak, setStreak] = useState(0);
-  const [score, setScore] = useState(0);
+  const [selectedDay,       setSelectedDay]       = useState(todayDate);
+  const [completedDays,     setCompletedDays]     = useState(new Set());
+  const [streak,            setStreak]            = useState(0);
+  const [score,             setScore]             = useState(0);
   const [lastCompletedDate, setLastCompletedDate] = useState(null);
+  const [milestoneAlert,    setMilestoneAlert]    = useState(null);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -27,34 +36,42 @@ function DailyBoard() {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({
-        selectedDay,
-        completedDays: [...completedDays],
-        streak,
-        score,
-        lastCompletedDate,
-      })
+      JSON.stringify({ selectedDay, completedDays: [...completedDays], streak, score, lastCompletedDate })
     );
   }, [selectedDay, completedDays, streak, score, lastCompletedDate]);
 
-  const current = useMemo(
+  const current   = useMemo(
     () => dailyContent.find((item) => item.day === Number(selectedDay)) || dailyContent[0],
     [selectedDay]
   );
-
-  const chumash = chumashByDayOfWeek[todayDayOfWeek];
+  const chumash   = chumashByDayOfWeek[todayDayOfWeek];
+  const parasha   = getCurrentParasha();
   const completed = completedDays.has(selectedDay);
+
+  const nextMilestone = MILESTONES.find((m) => m.days > streak);
+
+  const streakEmoji = streak >= 30 ? '🏆' : streak >= 21 ? '🌟' : streak >= 14 ? '⭐' : streak >= 7 ? '🎉' : '';
 
   const markDone = () => {
     if (completed) return;
-    const todayStr = now.toDateString();
+    const todayStr     = now.toDateString();
     const yesterdayStr = new Date(now - 86_400_000).toDateString();
-    const newSet = new Set(completedDays);
+
+    const newSet    = new Set(completedDays);
     newSet.add(selectedDay);
     setCompletedDays(newSet);
-    setScore((prev) => prev + 10);
-    setStreak((prev) => (lastCompletedDate === yesterdayStr ? prev + 1 : 1));
+
+    const newStreak  = lastCompletedDate === yesterdayStr ? streak + 1 : 1;
+    setStreak(newStreak);
     setLastCompletedDate(todayStr);
+
+    const milestone = MILESTONES.find((m) => m.days === newStreak);
+    setScore((prev) => prev + 10 + (milestone?.bonus ?? 0));
+
+    if (milestone) {
+      setMilestoneAlert(milestone);
+      setTimeout(() => setMilestoneAlert(null), 6000);
+    }
   };
 
   const resetProgress = () => {
@@ -62,10 +79,22 @@ function DailyBoard() {
     setStreak(0);
     setScore(0);
     setLastCompletedDate(null);
+    setMilestoneAlert(null);
   };
 
   return (
     <section>
+      {milestoneAlert && (
+        <div className="milestone-banner">
+          <span className="milestone-emoji">{milestoneAlert.emoji}</span>
+          <div className="milestone-text">
+            <strong>{milestoneAlert.label}</strong>
+            <p>השלמת {milestoneAlert.days} ימים ברצף — +{milestoneAlert.bonus} נקודות בונוס!</p>
+          </div>
+          <button className="milestone-close" onClick={() => setMilestoneAlert(null)}>×</button>
+        </div>
+      )}
+
       <div className="card page-intro-card">
         <div>
           <span className="pill">לוח לימוד</span>
@@ -91,10 +120,10 @@ function DailyBoard() {
           </select>
 
           <div className="content-list">
-            <div>
-              <span className="label">חומש — {chumash.label}</span>
-              <p className="text-soft">{chumash.description}</p>
-              <p className="day-of-week-note">יום {DAY_NAMES[todayDayOfWeek]}</p>
+            <div className="parasha-block">
+              <span className="label">חומש — פרשת <span className="parasha-name">{parasha.name}</span></span>
+              <p>{chumash.label} · יום {DAY_NAMES[todayDayOfWeek]} · ספר {parasha.book}</p>
+              <p className="text-soft" style={{ fontSize: '0.88rem', marginTop: '4px' }}>{chumash.description}</p>
             </div>
             <div>
               <span className="label">תהילים — פרקים {current.tehillim}</span>
@@ -108,19 +137,39 @@ function DailyBoard() {
 
         <article className="card stats-card">
           <h3>נקודות רצף</h3>
+
           <div className="progress-block">
             <span className="small-label">רצף נוכחי</span>
-            <strong>{streak} ימים</strong>
+            <div className="streak-row">
+              <strong className="streak-num">{streak}</strong>
+              <span className="streak-unit">ימים</span>
+              {streakEmoji && <span className="streak-badge">{streakEmoji}</span>}
+            </div>
           </div>
+
           <div className="progress-block">
             <span className="small-label">ניקוד מצטבר</span>
             <strong>{score} נקודות</strong>
           </div>
+
           <div className="progress-block">
             <span className="small-label">הושלמו החודש</span>
             <strong>{completedDays.size} / 30</strong>
           </div>
-          <p className="text-soft">סמן כל יום כהושלם כדי לשמור על הרצף ולצבור נקודות.</p>
+
+          <div className="milestone-progress">
+            <span className="small-label">יעד בונוס הבא</span>
+            {nextMilestone ? (
+              <p>
+                {nextMilestone.emoji} עוד {nextMilestone.days - streak} ימים ל{nextMilestone.label}
+                <br />
+                <span className="bonus-note">+{nextMilestone.bonus} נקודות בונוס!</span>
+              </p>
+            ) : (
+              <p>🏆 השגת את כל יעדי הבונוס!</p>
+            )}
+          </div>
+
           <div className="control-row">
             <button className="primary" onClick={markDone} disabled={completed}>
               {completed ? 'הושלם ✓' : 'סמן כמושלם'}
