@@ -123,7 +123,22 @@ select {
 }
 
 .feature-card {
-  min-height: 170px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-icon {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.feature-link {
+  margin-top: auto;
+  color: #ffbd4b;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .page-intro-card {
