@@ -406,6 +406,23 @@ input[type='time'] {
   color: #c5d1e3;
 }
 
+/* ── Quiz difficulty pills ── */
+.pill-קל     { background: rgba(110, 175, 94, 0.2);  color: #c8f0b8; }
+.pill-בינוני { background: rgba(255, 189, 75, 0.2);  color: #ffe5ba; }
+.pill-קשה    { background: rgba(220, 90, 90, 0.2);   color: #ffd3d3; }
+
+/* ── Quiz result ── */
+.result-score {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #ffbd4b;
+  margin: 0 0 8px;
+  line-height: 1;
+}
+.result-max   { font-size: 1.4rem; color: #bac9dc; font-weight: 400; }
+.result-msg   { font-size: 1.1rem; margin: 0 0 6px; }
+.result-record { color: #ffe5ba; font-weight: 700; }
+
 /* ── Quiz card state colors ── */
 .quiz-card.correct {
   border-color: rgba(110, 175, 94, 0.45);
