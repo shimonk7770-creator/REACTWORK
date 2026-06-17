@@ -1,54 +1,67 @@
 import { useEffect, useMemo, useState } from 'react';
-import { dailyContent } from '../data/dailyContent.js';
+import { chumashByDayOfWeek, dailyContent } from '../data/dailyContent.js';
 
 const STORAGE_KEY = 'reactwork-daily-state';
+const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
 function DailyBoard() {
-  const today = new Date().getDate();
-  const [selectedDay, setSelectedDay] = useState(today);
-  const [completed, setCompleted] = useState(false);
+  const now = new Date();
+  const todayDate = now.getDate();
+  const todayDayOfWeek = now.getDay(); // 0 = ראשון … 6 = שבת
+
+  const [selectedDay, setSelectedDay] = useState(todayDate);
+  const [completedDays, setCompletedDays] = useState(new Set());
   const [streak, setStreak] = useState(0);
   const [score, setScore] = useState(0);
-  const [lastCompletedDay, setLastCompletedDay] = useState(null);
+  const [lastCompletedDate, setLastCompletedDate] = useState(null);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     if (saved.selectedDay) setSelectedDay(saved.selectedDay);
-    setCompleted(!!saved.completed);
+    setCompletedDays(new Set(saved.completedDays || []));
     setStreak(saved.streak || 0);
     setScore(saved.score || 0);
-    setLastCompletedDay(saved.lastCompletedDay ?? null);
+    setLastCompletedDate(saved.lastCompletedDate ?? null);
   }, []);
 
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ selectedDay, completed, streak, score, lastCompletedDay })
+      JSON.stringify({
+        selectedDay,
+        completedDays: [...completedDays],
+        streak,
+        score,
+        lastCompletedDate,
+      })
     );
-  }, [selectedDay, completed, streak, score, lastCompletedDay]);
+  }, [selectedDay, completedDays, streak, score, lastCompletedDate]);
 
   const current = useMemo(
     () => dailyContent.find((item) => item.day === Number(selectedDay)) || dailyContent[0],
     [selectedDay]
   );
 
-  const isConsecutive = selectedDay === lastCompletedDay + 1;
-  const nextGoal = selectedDay + 1 <= dailyContent.length ? `יום ${selectedDay + 1}` : 'סיום החודש';
+  const chumash = chumashByDayOfWeek[todayDayOfWeek];
+  const completed = completedDays.has(selectedDay);
 
   const markDone = () => {
-    if (!completed) {
-      setCompleted(true);
-      setScore((prev) => prev + 10);
-      setStreak((prev) => (isConsecutive ? prev + 1 : 1));
-      setLastCompletedDay(selectedDay);
-    }
+    if (completed) return;
+    const todayStr = now.toDateString();
+    const yesterdayStr = new Date(now - 86_400_000).toDateString();
+    const newSet = new Set(completedDays);
+    newSet.add(selectedDay);
+    setCompletedDays(newSet);
+    setScore((prev) => prev + 10);
+    setStreak((prev) => (lastCompletedDate === yesterdayStr ? prev + 1 : 1));
+    setLastCompletedDate(todayStr);
   };
 
   const resetProgress = () => {
-    setCompleted(false);
+    setCompletedDays(new Set());
     setStreak(0);
     setScore(0);
-    setLastCompletedDay(null);
+    setLastCompletedDate(null);
   };
 
   return (
@@ -60,30 +73,31 @@ function DailyBoard() {
           <p>עקוב אחרי חומש, תהילים ותניא של היום. שמור רצף כדי לקבל ניקוד ולהתקדם.</p>
         </div>
         <div className="summary-badge">
-          <strong>{completed ? 'הושלם' : 'פתוח'}</strong>
-          <span>{completed ? 'יום היום הושלם' : 'עדיין לא סומן'}</span>
+          <strong>{completed ? '✓ הושלם' : 'פתוח'}</strong>
+          <span>{completed ? 'יום זה סומן כהושלם' : 'עדיין לא סומן'}</span>
         </div>
       </div>
 
       <div className="daily-grid">
         <article className="card today-card">
           <h3>תוכן היום</h3>
-          <p className="text-soft">בחר יום להצגת התכנים</p>
+          <p className="text-soft">בחר יום בחודש להצגת תהילים ותניא</p>
           <select value={selectedDay} onChange={(e) => setSelectedDay(Number(e.target.value))}>
             {dailyContent.map((item) => (
               <option key={item.day} value={item.day}>
-                יום {item.day} - {item.title}
+                יום {item.day}{completedDays.has(item.day) ? ' ✓' : ''}
               </option>
             ))}
           </select>
+
           <div className="content-list">
             <div>
-              <span className="label">חומש</span>
-              <p>{current.chumash}</p>
+              <span className="label">חומש — {chumash.label}</span>
+              <p className="text-soft">{chumash.description}</p>
+              <p className="day-of-week-note">יום {DAY_NAMES[todayDayOfWeek]}</p>
             </div>
             <div>
-              <span className="label">תהילים</span>
-              <p>{current.tehillim}</p>
+              <span className="label">תהילים — פרקים {current.tehillim}</span>
             </div>
             <div>
               <span className="label">תניא</span>
@@ -100,24 +114,29 @@ function DailyBoard() {
           </div>
           <div className="progress-block">
             <span className="small-label">ניקוד מצטבר</span>
-            <strong>{score}</strong>
+            <strong>{score} נקודות</strong>
           </div>
-          <p className="text-soft">הקש על הכפתור כדי לסמן את היום כהושלם ולצבור נקודות.</p>
+          <div className="progress-block">
+            <span className="small-label">הושלמו החודש</span>
+            <strong>{completedDays.size} / 30</strong>
+          </div>
+          <p className="text-soft">סמן כל יום כהושלם כדי לשמור על הרצף ולצבור נקודות.</p>
           <div className="control-row">
-            <button className="primary" onClick={markDone}>
-              סמן כמושלם
+            <button className="primary" onClick={markDone} disabled={completed}>
+              {completed ? 'הושלם ✓' : 'סמן כמושלם'}
             </button>
             <button className="secondary" onClick={resetProgress}>
-              איפוס רצף
+              איפוס
             </button>
           </div>
-          <p className="next-goal">המטרה הבאה: {nextGoal}</p>
         </article>
       </div>
 
       <div className="card notes-card">
         <h3>הסבר לימוד ליום {current.day}</h3>
-        <p>{current.notes}</p>
+        {current.notes.split('\n').map((line, i) => (
+          <p key={i}>{line}</p>
+        ))}
       </div>
     </section>
   );
