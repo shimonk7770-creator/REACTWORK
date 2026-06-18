@@ -152,9 +152,25 @@ function DailyBoard() {
             <strong>{score} נקודות</strong>
           </div>
 
-          <div className="progress-block">
-            <span className="small-label">הושלמו החודש</span>
-            <strong>{completedDays.size} / 30</strong>
+          <div className="progress-bar-wrap">
+            <div className="progress-bar-head">
+              <span className="small-label">התקדמות החודש</span>
+              <span className="progress-pct">{Math.round((completedDays.size / 30) * 100)}%</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${(completedDays.size / 30) * 100}%` }} />
+            </div>
+            <div className="progress-markers">
+              {[7, 14, 21, 30].map((m) => (
+                <span
+                  key={m}
+                  className={`progress-marker ${completedDays.size >= m ? 'reached' : ''}`}
+                  style={{ right: `${((30 - m) / 30) * 100}%` }}
+                  title={`${m} ימים`}
+                />
+              ))}
+            </div>
+            <p className="progress-count">{completedDays.size} מתוך 30 ימים הושלמו החודש</p>
           </div>
 
           <div className="milestone-progress">

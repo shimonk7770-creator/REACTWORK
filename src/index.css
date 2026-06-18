@@ -321,6 +321,66 @@ footer.app-footer {
   color: #f3f2ef;
 }
 
+/* ── Progress Bar ── */
+.progress-bar-wrap {
+  margin-bottom: 20px;
+}
+
+.progress-bar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-pct {
+  font-weight: 700;
+  color: #ffbd4b;
+  font-size: 0.95rem;
+}
+
+.progress-track {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  height: 14px;
+  overflow: visible;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffbd4b 0%, #6eaf5e 100%);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+}
+
+.progress-markers {
+  position: relative;
+  height: 0;
+}
+
+.progress-marker {
+  position: absolute;
+  top: -19px;
+  width: 4px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  transform: translateX(50%);
+  transition: background 0.3s;
+}
+
+.progress-marker.reached {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.progress-count {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: #bac9dc;
+}
+
 /* ── Milestone banner ── */
 .milestone-banner {
   background: linear-gradient(135deg, #3a9e5e, #2a7e46);

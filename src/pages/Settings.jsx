@@ -59,15 +59,21 @@ function Settings() {
           </div>
           <div className="stat-row">
             <div className="progress-block">
-              <span className="small-label">ימים שהושלמו</span>
-              <strong className="stat-number">{stats.completedDays}</strong>
-              <span className="stat-unit">ימים</span>
-            </div>
-            <div className="progress-block">
               <span className="small-label">שיא חידון</span>
               <strong className="stat-number">{stats.quizBest}</strong>
               <span className="stat-unit">נקודות</span>
             </div>
+          </div>
+
+          <div className="progress-bar-wrap" style={{ marginTop: '8px' }}>
+            <div className="progress-bar-head">
+              <span className="small-label">התקדמות החודש</span>
+              <span className="progress-pct">{Math.round((stats.completedDays / 30) * 100)}%</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${(stats.completedDays / 30) * 100}%` }} />
+            </div>
+            <p className="progress-count">{stats.completedDays} מתוך 30 ימים הושלמו החודש</p>
           </div>
         </div>
 
