@@ -295,10 +295,17 @@ footer.app-footer {
   flex-wrap: wrap;
 }
 
+/* 6. פידבק חידון */
+@keyframes feedbackSlide {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 .quiz-feedback {
   margin-top: 16px;
   padding: 12px 16px;
   border-radius: 16px;
+  animation: feedbackSlide 0.28s ease both;
 }
 
 .quiz-feedback.correct {
@@ -319,6 +326,67 @@ footer.app-footer {
 .result-block {
   margin-top: 18px;
   color: #f3f2ef;
+}
+
+/* ══════════════════════════════
+   אנימציות
+══════════════════════════════ */
+
+/* 1. כניסת עמוד */
+.app-content section {
+  animation: fadeInUp 0.38s ease both;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* כרטיסים בפיגור */
+.daily-grid > :nth-child(1) { animation: fadeInUp 0.38s 0.05s ease both; }
+.daily-grid > :nth-child(2) { animation: fadeInUp 0.38s 0.13s ease both; }
+.notes-card                  { animation: fadeInUp 0.38s 0.20s ease both; }
+.quiz-stack > :nth-child(n)  { animation: fadeInUp 0.35s calc(0.06s * var(--i, 1)) ease both; }
+
+/* 2. ניצוץ ירוק — סימון יום */
+@keyframes completedPulse {
+  0%   { box-shadow: 0 24px 70px rgba(0,0,0,0.16); border-color: rgba(255,255,255,0.08); }
+  35%  { box-shadow: 0 0 55px rgba(110,175,94,0.55); border-color: rgba(110,175,94,0.75); }
+  100% { box-shadow: 0 24px 70px rgba(0,0,0,0.16); border-color: rgba(255,255,255,0.08); }
+}
+
+.just-completed { animation: completedPulse 1.3s ease; }
+
+/* 3. קפיצת ניקוד */
+@keyframes scoreBump {
+  0%   { transform: scale(1);    color: inherit; }
+  40%  { transform: scale(1.38); color: #6eaf5e; }
+  100% { transform: scale(1);    color: inherit; }
+}
+
+.score-bump {
+  display: inline-block;
+  animation: scoreBump 0.75s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* 4. קפיצת רצף */
+@keyframes streakBounce {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.45); }
+  65%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+.streak-bounce {
+  display: inline-block;
+  animation: streakBounce 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* 5. לחיצת כפתור */
+button.primary:active,
+button.secondary:active {
+  transform: scale(0.94) !important;
+  transition: transform 0.07s ease !important;
 }
 
 /* ── Progress Bar ── */
