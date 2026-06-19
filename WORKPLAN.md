@@ -90,3 +90,9 @@
 - ✅ streakBounce: קפיצת מספר הרצף
 - ✅ לחיצת כפתור: scale(0.94) ב-active
 - ✅ feedbackSlide: כניסת פידבק חידון מימין
+
+## שלב 12 - תיעוד ארכיטקטורה ✅
+
+- ✅ ARCHITECTURE.md נפרד ומפורט (tech stack, component hierarchy, data flow, אלגוריתמים, design system)
+- ✅ עדכון README.md: parashaData.js, פרשת השבוע, בונוס רצף
+- ✅ סגירת כל ✅ ב-PRD (שאלה פתוחה 3 — תזכורות פנימיות)
