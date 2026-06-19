@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function Home() {
+  useEffect(() => { document.title = 'חת"ת יומי'; }, []);
   return (
     <section>
       <div className="hero-card card">

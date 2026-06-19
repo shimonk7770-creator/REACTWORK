@@ -57,6 +57,15 @@ REACTWORK/
         └── parashaData.js   # לוח פרשות ה׳תשפ״ו + getCurrentParasha()
 ```
 
+```
+pages/
+├── Home.jsx        # דף בית
+├── DailyBoard.jsx  # לוח יומי
+├── Quiz.jsx        # חידון
+├── Settings.jsx    # הגדרות
+└── NotFound.jsx    # דף 404 (Route path="*")
+```
+
 ---
 
 ## היררכיית קומפוננטים

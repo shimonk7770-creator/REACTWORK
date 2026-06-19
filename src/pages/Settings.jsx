@@ -5,6 +5,7 @@ const DAILY_KEY = 'reactwork-daily-state';
 const QUIZ_KEY = 'reactwork-quiz-best';
 
 function Settings() {
+  useEffect(() => { document.title = 'הגדרות | חת"ת יומי'; }, []);
   const [remindersOn, setRemindersOn] = useState(false);
   const [reminderTime, setReminderTime] = useState('08:00');
   const [stats, setStats] = useState({ streak: 0, score: 0, completedDays: 0, quizBest: 0 });

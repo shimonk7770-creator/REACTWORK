@@ -96,3 +96,10 @@
 - ✅ ARCHITECTURE.md נפרד ומפורט (tech stack, component hierarchy, data flow, אלגוריתמים, design system)
 - ✅ עדכון README.md: parashaData.js, פרשת השבוע, בונוס רצף
 - ✅ סגירת כל ✅ ב-PRD (שאלה פתוחה 3 — תזכורות פנימיות)
+
+## שלב 13 - ניקוי ושיפורים אחרונים ✅
+
+- ✅ מחיקת תיקיית `docs/` (כפילות של PRD/WORKPLAN)
+- ✅ favicon emoji 📖 ב-index.html
+- ✅ document.title דינמי לכל עמוד (לוח יומי / חידון פרשה / הגדרות)
+- ✅ דף 404 (NotFound.jsx + Route path="*")

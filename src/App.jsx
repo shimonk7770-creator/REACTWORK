@@ -4,6 +4,7 @@ import Home from './pages/Home.jsx';
 import DailyBoard from './pages/DailyBoard.jsx';
 import Quiz from './pages/Quiz.jsx';
 import Settings from './pages/Settings.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 function App() {
   const [reminderVisible, setReminderVisible] = useState(false);
@@ -71,6 +72,7 @@ function App() {
           <Route path="/daily" element={<DailyBoard />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

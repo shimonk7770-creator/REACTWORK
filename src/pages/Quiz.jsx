@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 const QUIZ_STORAGE_KEY = 'reactwork-quiz-best';
 
+
+
 const allQuestions = [
   // קל (5 נקודות)
   { id: 1,  question: 'כמה ספרים יש בתורה?',                           options: ['3', '5', '7', '10'],                                             answer: '5',                          difficulty: 'קל' },
@@ -38,6 +40,7 @@ function pickRandom(arr, n) {
 }
 
 function Quiz() {
+  useEffect(() => { document.title = 'חידון פרשה | חת"ת יומי'; }, []);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);

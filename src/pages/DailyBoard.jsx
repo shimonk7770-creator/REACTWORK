@@ -23,6 +23,11 @@ function DailyBoard() {
   const [score,             setScore]             = useState(0);
   const [lastCompletedDate, setLastCompletedDate] = useState(null);
   const [milestoneAlert,    setMilestoneAlert]    = useState(null);
+  const [justCompleted,     setJustCompleted]     = useState(false);
+  const [scoreAnim,         setScoreAnim]         = useState(false);
+  const [streakAnim,        setStreakAnim]         = useState(false);
+
+  useEffect(() => { document.title = 'לוח יומי | חת"ת יומי'; }, []);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -68,6 +73,14 @@ function DailyBoard() {
     const milestone = MILESTONES.find((m) => m.days === newStreak);
     setScore((prev) => prev + 10 + (milestone?.bonus ?? 0));
 
+    // אנימציות
+    setJustCompleted(true);
+    setScoreAnim(true);
+    setStreakAnim(true);
+    setTimeout(() => setJustCompleted(false), 1300);
+    setTimeout(() => setScoreAnim(false),     800);
+    setTimeout(() => setStreakAnim(false),     700);
+
     if (milestone) {
       setMilestoneAlert(milestone);
       setTimeout(() => setMilestoneAlert(null), 6000);
@@ -95,7 +108,7 @@ function DailyBoard() {
         </div>
       )}
 
-      <div className="card page-intro-card">
+      <div className={`card page-intro-card${justCompleted ? ' just-completed' : ''}`}>
         <div>
           <span className="pill">לוח לימוד</span>
           <h2>יום {selectedDay} בחודש</h2>
@@ -141,7 +154,7 @@ function DailyBoard() {
           <div className="progress-block">
             <span className="small-label">רצף נוכחי</span>
             <div className="streak-row">
-              <strong className="streak-num">{streak}</strong>
+              <strong className={`streak-num${streakAnim ? ' streak-bounce' : ''}`}>{streak}</strong>
               <span className="streak-unit">ימים</span>
               {streakEmoji && <span className="streak-badge">{streakEmoji}</span>}
             </div>
@@ -149,7 +162,7 @@ function DailyBoard() {
 
           <div className="progress-block">
             <span className="small-label">ניקוד מצטבר</span>
-            <strong>{score} נקודות</strong>
+            <strong className={scoreAnim ? 'score-bump' : ''}>{score} נקודות</strong>
           </div>
 
           <div className="progress-bar-wrap">
