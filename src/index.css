@@ -328,6 +328,171 @@ footer.app-footer {
   color: #f3f2ef;
 }
 
+/* ── לוח שנה עברי (גריד) ── */
+.hcal-card { padding: 20px; }
+
+.hcal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.hcal-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hcal-month-name { font-size: 1.2rem; font-weight: 700; color: #fff; }
+.hcal-month-he   { font-size: 0.85rem; color: #ffbd4b; }
+
+.hcal-nav {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.hcal-nav:hover { background: rgba(255,189,75,0.2); }
+
+.hcal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.hcal-dow {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  padding: 6px 0;
+}
+.hcal-dow.shabbat-col { color: #ffbd4b; }
+
+.hcal-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  cursor: default;
+  transition: background 0.15s;
+  min-height: 48px;
+}
+.hcal-cell.empty { background: transparent; }
+.hcal-cell.shabbat { background: rgba(255,189,75,0.07); }
+.hcal-cell.today {
+  background: rgba(110,175,94,0.25);
+  border: 2px solid #6eaf5e;
+}
+.hcal-cell.done {
+  background: rgba(110,175,94,0.15);
+}
+
+.hcal-greg {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f0ece4;
+  line-height: 1;
+}
+.hcal-heb {
+  font-size: 0.68rem;
+  color: #aaa;
+  margin-top: 2px;
+}
+.hcal-check {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 0.65rem;
+  color: #6eaf5e;
+}
+.hcal-dot {
+  position: absolute;
+  bottom: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffbd4b;
+}
+
+.hcal-legend {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: #888;
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.leg-today  { width:12px; height:12px; border-radius:4px; background:rgba(110,175,94,0.4); border:1.5px solid #6eaf5e; }
+.leg-done   { width:12px; height:12px; border-radius:4px; background:rgba(110,175,94,0.2); }
+.leg-dot    { width:8px; height:8px; border-radius:50%; background:#ffbd4b; }
+
+/* ── לוח עברי (כותרת תאריך) ── */
+.hebrew-date-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 24px;
+  text-align: center;
+  background: linear-gradient(135deg, #1a1a3e 0%, #12223a 100%);
+  border: 1px solid rgba(255, 189, 75, 0.2);
+  margin-bottom: 8px;
+}
+
+.hdc-top { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.hdc-day-name {
+  font-size: 0.9rem;
+  color: #ffbd4b;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hdc-hebrew {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.hdc-gregorian {
+  font-size: 0.95rem;
+  color: #aaa;
+}
+
+.hdc-events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.hdc-event-pill {
+  background: rgba(110, 175, 94, 0.18);
+  color: #b8f0a8;
+  border: 1px solid rgba(110, 175, 94, 0.35);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.88rem;
+}
+
 /* ══════════════════════════════
    אנימציות
 ══════════════════════════════ */

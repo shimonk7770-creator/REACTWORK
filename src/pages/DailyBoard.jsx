@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { chumashByDayOfWeek, dailyContent } from '../data/dailyContent.js';
 import { getCurrentParasha } from '../data/parashaData.js';
+import HebrewCalendarGrid from '../components/HebrewCalendarGrid.jsx';
 
 const STORAGE_KEY = 'reactwork-daily-state';
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
@@ -97,6 +98,8 @@ function DailyBoard() {
 
   return (
     <section>
+      <HebrewCalendarGrid completedDays={completedDays} />
+
       {milestoneAlert && (
         <div className="milestone-banner">
           <span className="milestone-emoji">{milestoneAlert.emoji}</span>
