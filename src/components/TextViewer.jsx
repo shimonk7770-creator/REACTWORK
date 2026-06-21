@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const stripTags = (s) => s.replace(/<[^>]*>/g, '').trim();
+
 function parseResponse(data) {
   const he = data.he;
   if (!he || !he.length) return null;
@@ -9,7 +11,7 @@ function parseResponse(data) {
     const startChap = Array.isArray(data.sections) ? data.sections[0] : 1;
     return he.map((chap, i) => ({
       chapterNum: startChap + i,
-      verses: chap.filter((v) => v && v.trim()),
+      verses: chap.filter((v) => v && stripTags(v)),
       startVerse: 1,
     }));
   }
@@ -21,7 +23,7 @@ function parseResponse(data) {
       : 1;
   return [{
     chapterNum: Array.isArray(data.sections) ? data.sections[0] : null,
-    verses: he.filter((v) => v && v.trim()),
+    verses: he.filter((v) => v && stripTags(v)),
     startVerse,
   }];
 }

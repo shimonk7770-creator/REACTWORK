@@ -89,38 +89,22 @@ const tehillimRefs = [
   'Psalms.140-144',    'Psalms.145-150',
 ];
 
-// Sefaria API refs for Tanya (first chapter of each day's portion)
+// Sefaria API refs for Tanya — פורמט: Tanya,_Part_X;_SectionName.chapter
+// מציג את הפרק הראשון של כל חלק יומי
+const LA  = 'Tanya,_Part_I;_Likkutei_Amarim';
+const SHY = 'Tanya,_Part_II;_Shaar_HaYichud_VehaEmunah';
+const IHT = 'Tanya,_Part_III;_Iggeret_HaTeshuvah';
+const IHK = 'Tanya,_Part_IV;_Iggeret_HaKodesh';
+
 const tanyaRefs = [
-  'Tanya, Likutei Amarim, Chapter 1',
-  'Tanya, Likutei Amarim, Chapter 2',
-  'Tanya, Likutei Amarim, Chapter 4',
-  'Tanya, Likutei Amarim, Chapter 6',
-  'Tanya, Likutei Amarim, Chapter 9',
-  'Tanya, Likutei Amarim, Chapter 11',
-  'Tanya, Likutei Amarim, Chapter 13',
-  'Tanya, Likutei Amarim, Chapter 16',
-  'Tanya, Likutei Amarim, Chapter 18',
-  'Tanya, Likutei Amarim, Chapter 20',
-  'Tanya, Likutei Amarim, Chapter 23',
-  'Tanya, Likutei Amarim, Chapter 26',
-  'Tanya, Likutei Amarim, Chapter 29',
-  'Tanya, Likutei Amarim, Chapter 31',
-  'Tanya, Likutei Amarim, Chapter 33',
-  'Tanya, Likutei Amarim, Chapter 36',
-  'Tanya, Likutei Amarim, Chapter 38',
-  'Tanya, Likutei Amarim, Chapter 41',
-  'Tanya, Likutei Amarim, Chapter 44',
-  'Tanya, Likutei Amarim, Chapter 46',
-  'Tanya, Likutei Amarim, Chapter 49',
-  'Tanya, Likutei Amarim, Chapter 52',
-  'Tanya, Shaar HaYichud VehaEmunah, Chapter 1',
-  'Tanya, Shaar HaYichud VehaEmunah, Chapter 3',
-  'Tanya, Shaar HaYichud VehaEmunah, Chapter 6',
-  'Tanya, Shaar HaYichud VehaEmunah, Chapter 9',
-  'Tanya, Iggeret HaTeshuvah, Chapter 1',
-  'Tanya, Iggeret HaTeshuvah, Chapter 5',
-  'Tanya, Iggeret HaTeshuvah, Chapter 9',
-  'Tanya, Iggeret HaKodesh, Chapter 1',
+  `${LA}.1`,  `${LA}.2`,  `${LA}.4`,  `${LA}.6`,  `${LA}.9`,
+  `${LA}.11`, `${LA}.13`, `${LA}.16`, `${LA}.18`, `${LA}.20`,
+  `${LA}.23`, `${LA}.26`, `${LA}.29`, `${LA}.31`, `${LA}.33`,
+  `${LA}.36`, `${LA}.38`, `${LA}.41`, `${LA}.44`, `${LA}.46`,
+  `${LA}.49`, `${LA}.52`,
+  `${SHY}.1`, `${SHY}.3`, `${SHY}.6`, `${SHY}.9`,
+  `${IHT}.1`, `${IHT}.5`, `${IHT}.9`,
+  `${IHK}.1`,
 ];
 
 export const dailyContent = tehillimList.map(([tehillim, tehillimNote], i) => {
