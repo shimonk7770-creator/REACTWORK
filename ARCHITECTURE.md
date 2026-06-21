@@ -53,8 +53,9 @@ REACTWORK/
     │   ├── Quiz.jsx         # חידון — randomization + ניקוד לפי רמה
     │   └── Settings.jsx     # הגדרות — תזכורת יומית + סטטיסטיקה
     └── data/
-        ├── dailyContent.js  # תוכן: chumashByDayOfWeek + dailyContent[30]
-        └── parashaData.js   # לוח פרשות ה׳תשפ״ו + getCurrentParasha()
+        ├── dailyContent.js      # תוכן: chumashByDayOfWeek + dailyContent[30]
+        ├── parashaData.js       # לוח פרשות ה׳תשפ״ו + getCurrentParasha()
+        └── parashaQuestions.js  # ~700 שאלות מ-abc770.org + PARASHA_ALIASES + getQuestionsForParasha()
 ```
 
 ```
@@ -102,7 +103,8 @@ useState: selectedDay, completedDays (Set), streak, score,
 ### Quiz — מצב מקומי
 
 ```js
-useState: questions (6 רנדומליות), answers, submitted, score, bestScore
+useState: questions (6 רנדומליות לפרשה), current, selected, revealed,
+          score, results, done, bestScore, scoreAnim, isNewBest
 ```
 
 ### Settings — מצב מקומי
