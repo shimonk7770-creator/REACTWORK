@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { chumashByDayOfWeek, dailyContent } from '../data/dailyContent.js';
 import { getCurrentParasha } from '../data/parashaData.js';
 import HebrewCalendarGrid from '../components/HebrewCalendarGrid.jsx';
+import TextViewer from '../components/TextViewer.jsx';
 
 const STORAGE_KEY = 'reactwork-daily-state';
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
@@ -140,13 +141,24 @@ function DailyBoard() {
               <span className="label">חומש — פרשת <span className="parasha-name">{parasha.name}</span></span>
               <p>{chumash.label} · יום {DAY_NAMES[todayDayOfWeek]} · ספר {parasha.book}</p>
               <p className="text-soft" style={{ fontSize: '0.88rem', marginTop: '4px' }}>{chumash.description}</p>
+              <a
+                className="text-viewer-btn"
+                href="https://www.chabad.org.il/Lessons/Lessons.asp?CategoryID=175"
+                target="_blank"
+                rel="noreferrer"
+                style={{ display: 'inline-block', marginTop: '10px', textDecoration: 'none' }}
+              >
+                📖 קרא ב-Chabad.org.il ↗
+              </a>
             </div>
             <div>
               <span className="label">תהילים — פרקים {current.tehillim}</span>
+              <TextViewer sefariaRef={current.tehillimRef} fallbackLabel="Sefaria.org" />
             </div>
             <div>
               <span className="label">תניא</span>
               <p>{current.tanya}</p>
+              <TextViewer sefariaRef={current.tanyaRef} fallbackLabel="Sefaria.org" />
             </div>
           </div>
         </article>

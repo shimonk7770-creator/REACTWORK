@@ -77,13 +77,61 @@ const tanyaList = [
   ['אגרת הקודש',                         'אגרות רבנו הזקן — עניין הצדקה, תורה ותפילה'],
 ];
 
+// Sefaria API refs for Tehillim (Psalms)
+const tehillimRefs = [
+  'Psalms.1-9',        'Psalms.10-17',      'Psalms.18-22',      'Psalms.23-28',
+  'Psalms.29-34',      'Psalms.35-38',      'Psalms.39-43',      'Psalms.44-48',
+  'Psalms.49-54',      'Psalms.55-59',      'Psalms.60-65',      'Psalms.66-68',
+  'Psalms.69-71',      'Psalms.72-76',      'Psalms.77-78',      'Psalms.79-82',
+  'Psalms.83-87',      'Psalms.88-89',      'Psalms.90-96',      'Psalms.97-103',
+  'Psalms.104-105',    'Psalms.106-107',    'Psalms.108-112',    'Psalms.113-118',
+  'Psalms.119.1-96',   'Psalms.119.97-176', 'Psalms.120-134',   'Psalms.135-139',
+  'Psalms.140-144',    'Psalms.145-150',
+];
+
+// Sefaria API refs for Tanya (first chapter of each day's portion)
+const tanyaRefs = [
+  'Tanya, Likutei Amarim, Chapter 1',
+  'Tanya, Likutei Amarim, Chapter 2',
+  'Tanya, Likutei Amarim, Chapter 4',
+  'Tanya, Likutei Amarim, Chapter 6',
+  'Tanya, Likutei Amarim, Chapter 9',
+  'Tanya, Likutei Amarim, Chapter 11',
+  'Tanya, Likutei Amarim, Chapter 13',
+  'Tanya, Likutei Amarim, Chapter 16',
+  'Tanya, Likutei Amarim, Chapter 18',
+  'Tanya, Likutei Amarim, Chapter 20',
+  'Tanya, Likutei Amarim, Chapter 23',
+  'Tanya, Likutei Amarim, Chapter 26',
+  'Tanya, Likutei Amarim, Chapter 29',
+  'Tanya, Likutei Amarim, Chapter 31',
+  'Tanya, Likutei Amarim, Chapter 33',
+  'Tanya, Likutei Amarim, Chapter 36',
+  'Tanya, Likutei Amarim, Chapter 38',
+  'Tanya, Likutei Amarim, Chapter 41',
+  'Tanya, Likutei Amarim, Chapter 44',
+  'Tanya, Likutei Amarim, Chapter 46',
+  'Tanya, Likutei Amarim, Chapter 49',
+  'Tanya, Likutei Amarim, Chapter 52',
+  'Tanya, Shaar HaYichud VehaEmunah, Chapter 1',
+  'Tanya, Shaar HaYichud VehaEmunah, Chapter 3',
+  'Tanya, Shaar HaYichud VehaEmunah, Chapter 6',
+  'Tanya, Shaar HaYichud VehaEmunah, Chapter 9',
+  'Tanya, Iggeret HaTeshuvah, Chapter 1',
+  'Tanya, Iggeret HaTeshuvah, Chapter 5',
+  'Tanya, Iggeret HaTeshuvah, Chapter 9',
+  'Tanya, Iggeret HaKodesh, Chapter 1',
+];
+
 export const dailyContent = tehillimList.map(([tehillim, tehillimNote], i) => {
   const [tanya, tanyaNote] = tanyaList[i];
   return {
     day: i + 1,
     title: `יום ${i + 1}`,
     tehillim,
+    tehillimRef: tehillimRefs[i],
     tanya,
+    tanyaRef: tanyaRefs[i],
     notes: `תהילים: ${tehillimNote}\nתניא: ${tanyaNote}`,
   };
 });

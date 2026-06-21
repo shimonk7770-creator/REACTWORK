@@ -819,6 +819,92 @@ button:disabled {
   margin: 4px 0 0;
 }
 
+/* ── TextViewer — קריאת פסוקים מ-Sefaria ── */
+.text-viewer {
+  margin-top: 12px;
+}
+
+.text-viewer-btn {
+  display: inline-block;
+  font-size: 0.85rem;
+  padding: 7px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: #e8e2d8;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s;
+  font-family: inherit;
+}
+
+.text-viewer-btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  transform: translateY(-1px);
+}
+
+.text-viewer-panel {
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 16px 20px;
+  max-height: 420px;
+  overflow-y: auto;
+  direction: rtl;
+  animation: fadeInUp 0.22s ease both;
+}
+
+.text-viewer-panel::-webkit-scrollbar       { width: 5px; }
+.text-viewer-panel::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+.text-viewer-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 3px; }
+
+.text-viewer-status {
+  text-align: center;
+  color: #bac9dc;
+  font-size: 0.9rem;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.text-viewer-link {
+  color: #ffbd4b;
+  text-decoration: underline;
+}
+
+.text-section { margin-bottom: 14px; }
+
+.text-section-head {
+  font-size: 0.82rem;
+  color: #ffbd4b;
+  font-weight: 700;
+  margin: 14px 0 6px;
+  border-bottom: 1px solid rgba(255, 189, 75, 0.2);
+  padding-bottom: 4px;
+}
+
+.text-verse {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 7px;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #e8e2d8;
+}
+
+.verse-num {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: #ffbd4b;
+  font-weight: 700;
+  min-width: 22px;
+  text-align: center;
+  margin-top: 5px;
+  background: rgba(255, 189, 75, 0.1);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
 /* ── חידון — פריסה חדשה (שאלה אחת בכל פעם) ── */
 .quiz-progress-bar {
   height: 6px;
