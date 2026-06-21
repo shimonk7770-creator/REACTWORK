@@ -1,119 +1,203 @@
+/* ─── Design Tokens ─── */
 :root {
+  --gold:        #ffbd4b;
+  --gold-dim:    rgba(255, 189, 75, 0.18);
+  --gold-soft:   #ffe5ba;
+  --green:       #6eaf5e;
+  --green-dim:   rgba(110, 175, 94, 0.18);
+  --red:         #dc5a5a;
+  --red-dim:     rgba(220, 90, 90, 0.18);
+  --bg-0:        #010810;
+  --bg-1:        #08101e;
+  --bg-2:        #0d1a2e;
+  --glass:       rgba(255, 255, 255, 0.045);
+  --glass-2:     rgba(255, 255, 255, 0.075);
+  --border:      rgba(255, 255, 255, 0.08);
+  --border-2:    rgba(255, 255, 255, 0.14);
+  --text:        #f0ece4;
+  --text-soft:   #bac9dc;
+  --text-dim:    #7a8fa8;
+  --radius-card: 28px;
+  --radius-btn:  16px;
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.28);
+
   color-scheme: dark;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #08101e;
-  color: #f7f4ef;
+  font-family: 'Heebo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-0);
+  color: var(--text);
   line-height: 1.6;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
+/* ─── Background — subtle animated radial ─── */
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #2b3d5b 0%, #08101e 58%, #02060d 100%);
+  background:
+    radial-gradient(ellipse 80% 55% at 15% -5%,  rgba(43, 61, 91, 0.65) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 105%, rgba(110, 175, 94, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, #08101e 0%, #010810 100%);
+  animation: bgDrift 22s ease-in-out infinite alternate;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@keyframes bgDrift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 3% 5%; }
 }
 
-button,
-input,
-select {
-  font: inherit;
-}
+a  { color: inherit; text-decoration: none; }
+button, input, select { font: inherit; }
 
+/* ─── Shell ─── */
 .app-shell {
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
 }
 
+/* ════════════════════════════════════════
+   HEADER — compact sticky glassmorphism
+════════════════════════════════════════ */
 .app-header {
-  padding: 28px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  padding: 0 32px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  background: linear-gradient(180deg, rgba(9, 20, 35, 0.96), rgba(6, 11, 20, 0.92));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  align-items: center;
+  gap: 20px;
+  background: rgba(3, 10, 22, 0.82);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-bottom: 1px solid var(--border);
 }
 
-.brand-group {
-  max-width: 720px;
+/* Brand logo (compact) */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
+.brand-icon {
+  font-size: 1.45rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 189, 75, 0.45));
+}
+
+.brand-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, var(--gold) 0%, #ff9a6c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Legacy — kept for any external usage */
+.brand-group { max-width: 720px; }
 .brand-badge {
   display: inline-block;
-  background: rgba(255, 189, 75, 0.18);
-  color: #ffe5ba;
-  padding: 8px 16px;
+  background: var(--gold-dim);
+  color: var(--gold-soft);
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 0.9rem;
-  margin-bottom: 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 189, 75, 0.22);
+  margin-bottom: 12px;
 }
+.app-header h1 { margin: 0 0 8px; font-size: clamp(2rem, 3vw, 3.2rem); letter-spacing: 0.02em; }
+.app-header p  { margin: 0; color: var(--text-soft); max-width: 600px; }
 
-.app-header h1 {
-  margin: 0 0 10px;
-  font-size: clamp(2.2rem, 3vw, 3.5rem);
-  letter-spacing: 0.03em;
-}
-
-.app-header p {
-  margin: 0;
-  color: #c5d1e3;
-  max-width: 600px;
-}
-
+/* ─── Navigation ─── */
 .app-nav {
   display: flex;
-  gap: 14px;
+  gap: 6px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .app-nav a {
-  padding: 12px 20px;
+  padding: 8px 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  transition: transform 0.2s ease, background 0.2s ease;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .app-nav a:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border);
 }
 
 .app-nav a.active {
-  background: linear-gradient(135deg, #ffbd4b, #ff8c71);
-  color: #161616;
+  background: linear-gradient(135deg, rgba(255, 189, 75, 0.22), rgba(255, 140, 113, 0.18));
+  color: var(--gold-soft);
+  border-color: rgba(255, 189, 75, 0.35);
+  box-shadow: 0 0 18px rgba(255, 189, 75, 0.14);
 }
 
+/* ─── Content ─── */
 .app-content {
   padding: 32px;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
+/* ════════════════════════════════════════
+   CARDS — glassmorphism + hover lift
+════════════════════════════════════════ */
 .card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 32px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.16);
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   padding: 28px;
   margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(255, 189, 75, 0.07);
+  border-color: rgba(255, 255, 255, 0.11);
+}
+
+/* Hero card */
 .hero-card {
   display: grid;
   gap: 20px;
-  padding: 36px;
-  background: linear-gradient(135deg, rgba(44, 68, 110, 0.95), rgba(8, 16, 30, 0.96));
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(44, 68, 110, 0.75), rgba(8, 16, 30, 0.9));
+  border-color: rgba(255, 189, 75, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -15%;
+  width: 55%;
+  height: 200%;
+  background: radial-gradient(ellipse, rgba(255, 189, 75, 0.07) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .hero-actions {
@@ -122,31 +206,60 @@ select {
   flex-wrap: wrap;
 }
 
+/* Feature cards */
 .feature-card {
   min-height: 180px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
-.feature-icon {
-  font-size: 1.8rem;
-  margin-bottom: 4px;
+.feature-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 189, 75, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
+
+.feature-card:hover::after { opacity: 1; }
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 4px;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon { transform: scale(1.15); }
 
 .feature-link {
   margin-top: auto;
-  color: #ffbd4b;
+  color: var(--gold);
   font-weight: 600;
   font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.2s ease, color 0.2s ease;
 }
 
+.feature-card:hover .feature-link { gap: 8px; color: var(--gold-soft); }
+
+/* Page intro card */
 .page-intro-card {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 24px;
   flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(20, 35, 60, 0.8), rgba(8, 16, 30, 0.6));
+  border-color: rgba(255, 189, 75, 0.1);
 }
 
 .page-intro-card h2,
@@ -155,6 +268,7 @@ select {
   margin-top: 0;
 }
 
+/* ─── Grids ─── */
 .stats-grid,
 .features-grid {
   display: grid;
@@ -168,6 +282,7 @@ select {
   grid-template-columns: 1.4fr 0.8fr;
 }
 
+/* ─── Content list ─── */
 .content-list {
   display: grid;
   gap: 14px;
@@ -175,21 +290,30 @@ select {
 }
 
 .content-list div {
-  background: rgba(255, 255, 255, 0.04);
-  padding: 16px;
+  background: rgba(255, 255, 255, 0.033);
+  padding: 16px 18px;
   border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+.content-list div:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+/* ─── Typography helpers ─── */
 .label {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   margin-bottom: 8px;
-  color: #c5d1e3;
+  color: var(--text-soft);
+  font-weight: 500;
 }
 
 .summary-badge {
   display: grid;
-  gap: 10px;
+  gap: 6px;
   align-items: start;
   text-align: right;
 }
@@ -202,90 +326,134 @@ select {
 .highlight,
 .pill {
   display: inline-block;
-  background: rgba(255, 189, 75, 0.16);
-  color: #ffe5ba;
-  padding: 8px 14px;
+  background: var(--gold-dim);
+  color: var(--gold-soft);
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 189, 75, 0.2);
 }
 
-.text-soft {
-  color: #bac9dc;
-}
+.text-soft { color: var(--text-soft); }
 
-button.primary,
-button.secondary {
+/* ════════════════════════════════════════
+   BUTTONS
+════════════════════════════════════════ */
+button.primary, a.primary,
+button.secondary, a.secondary {
+  font-weight: 600;
+  letter-spacing: 0.01em;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-button.primary:hover,
-button.secondary:hover {
-  transform: translateY(-2px);
-}
-
-button.primary {
+button.primary, a.primary {
   background: linear-gradient(135deg, #ffbd4b, #ff8c71);
   color: #161616;
   border: none;
-  border-radius: 16px;
-  padding: 14px 24px;
+  border-radius: var(--radius-btn);
+  padding: 13px 26px;
   cursor: pointer;
-  box-shadow: 0 16px 30px rgba(255, 189, 75, 0.24);
+  box-shadow: 0 8px 24px rgba(255, 189, 75, 0.32), 0 2px 8px rgba(255, 140, 113, 0.2);
 }
 
-button.secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 16px;
-  padding: 14px 24px;
+/* Shimmer sweep on primary button */
+button.primary::after, a.primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: 130%;
+  width: 55%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: skewX(-15deg);
+  animation: shimmerBtn 3.5s ease-in-out infinite;
+}
+
+@keyframes shimmerBtn {
+  0%   { right: 130%; }
+  55%  { right: -65%; }
+  100% { right: -65%; }
+}
+
+button.primary:hover, a.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(255, 189, 75, 0.42), 0 4px 14px rgba(255, 140, 113, 0.28);
+}
+
+button.secondary, a.secondary {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-btn);
+  padding: 13px 26px;
   cursor: pointer;
 }
 
+button.secondary:hover, a.secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+button.primary:active, a.primary:active,
+button.secondary:active, a.secondary:active {
+  transform: scale(0.94) !important;
+  transition: transform 0.07s ease !important;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ─── Form inputs ─── */
 select,
 input[type='number'] {
   width: 100%;
-  padding: 14px 16px;
+  padding: 13px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--border-2);
   background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  color: var(--text);
+  appearance: auto;
 }
 
+/* ─── Footer ─── */
 footer.app-footer {
-  padding: 22px 32px;
+  padding: 20px 32px;
   text-align: center;
-  color: #8f9eb7;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 0.88rem;
 }
 
+/* ─── Labels & stats ─── */
 .small-label {
-  color: #bac9dc;
-  font-size: 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.88rem;
   display: block;
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
-.progress-block {
-  margin-bottom: 18px;
-}
+.progress-block { margin-bottom: 18px; }
+.next-goal      { margin-top: 18px; color: var(--text-soft); }
 
-.next-goal {
-  margin-top: 18px;
-  color: #c5d1e3;
-}
+/* ─── Quiz (legacy stack) ─── */
+.quiz-stack { display: grid; gap: 18px; }
 
-.quiz-stack {
-  display: grid;
-  gap: 18px;
-}
-
-.quiz-card {
-  transition: transform 0.18s ease;
-}
-
-.quiz-card:hover {
-  transform: translateY(-2px);
-}
+.quiz-card { transition: transform 0.18s ease; }
+.quiz-card:hover { transform: translateY(-2px); }
 
 .quiz-card-header {
   display: flex;
@@ -295,40 +463,9 @@ footer.app-footer {
   flex-wrap: wrap;
 }
 
-/* 6. פידבק חידון */
-@keyframes feedbackSlide {
-  from { opacity: 0; transform: translateX(12px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-.quiz-feedback {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 16px;
-  animation: feedbackSlide 0.28s ease both;
-}
-
-.quiz-feedback.correct {
-  background: rgba(110, 175, 94, 0.16);
-  color: #dff4d6;
-}
-
-.quiz-feedback.wrong,
-.quiz-feedback.missing {
-  background: rgba(220, 90, 90, 0.16);
-  color: #ffd3d3;
-}
-
-.quiz-footer-card {
-  text-align: center;
-}
-
-.result-block {
-  margin-top: 18px;
-  color: #f3f2ef;
-}
-
-/* ── לוח שנה עברי (גריד) ── */
+/* ════════════════════════════════════════
+   HEBREW CALENDAR GRID
+════════════════════════════════════════ */
 .hcal-card { padding: 20px; }
 
 .hcal-header {
@@ -346,11 +483,11 @@ footer.app-footer {
 }
 
 .hcal-month-name { font-size: 1.2rem; font-weight: 700; color: #fff; }
-.hcal-month-he   { font-size: 0.85rem; color: #ffbd4b; }
+.hcal-month-he   { font-size: 0.85rem; color: var(--gold); }
 
 .hcal-nav {
-  background: rgba(255,255,255,0.08);
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   color: #fff;
   font-size: 1.4rem;
   width: 36px;
@@ -360,9 +497,9 @@ footer.app-footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
-.hcal-nav:hover { background: rgba(255,189,75,0.2); }
+.hcal-nav:hover { background: rgba(255, 189, 75, 0.18); border-color: rgba(255, 189, 75, 0.35); }
 
 .hcal-grid {
   display: grid;
@@ -374,10 +511,10 @@ footer.app-footer {
   text-align: center;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #888;
+  color: #666;
   padding: 6px 0;
 }
-.hcal-dow.shabbat-col { color: #ffbd4b; }
+.hcal-dow.shabbat-col { color: var(--gold); }
 
 .hcal-cell {
   position: relative;
@@ -387,38 +524,34 @@ footer.app-footer {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.035);
   cursor: default;
-  transition: background 0.15s;
+  transition: background 0.15s ease, transform 0.15s ease;
   min-height: 48px;
 }
-.hcal-cell.empty { background: transparent; }
-.hcal-cell.shabbat { background: rgba(255,189,75,0.07); }
-.hcal-cell.today {
-  background: rgba(110,175,94,0.25);
-  border: 2px solid #6eaf5e;
-}
-.hcal-cell.done {
-  background: rgba(110,175,94,0.15);
+
+.hcal-cell:hover:not(.empty) {
+  background: rgba(255, 255, 255, 0.07);
+  transform: scale(1.06);
 }
 
-.hcal-greg {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f0ece4;
-  line-height: 1;
+.hcal-cell.empty   { background: transparent; }
+.hcal-cell.shabbat { background: rgba(255, 189, 75, 0.06); }
+.hcal-cell.today {
+  background: rgba(110, 175, 94, 0.22);
+  border: 2px solid var(--green);
+  box-shadow: 0 0 14px rgba(110, 175, 94, 0.28);
 }
-.hcal-heb {
-  font-size: 0.68rem;
-  color: #aaa;
-  margin-top: 2px;
-}
+.hcal-cell.done { background: rgba(110, 175, 94, 0.13); }
+
+.hcal-greg { font-size: 1rem; font-weight: 600; color: #f0ece4; line-height: 1; }
+.hcal-heb  { font-size: 0.68rem; color: #888; margin-top: 2px; }
 .hcal-check {
   position: absolute;
   top: 3px;
   left: 4px;
   font-size: 0.65rem;
-  color: #6eaf5e;
+  color: var(--green);
 }
 .hcal-dot {
   position: absolute;
@@ -426,7 +559,7 @@ footer.app-footer {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #ffbd4b;
+  background: var(--gold);
 }
 
 .hcal-legend {
@@ -435,14 +568,14 @@ footer.app-footer {
   justify-content: center;
   margin-top: 14px;
   font-size: 0.8rem;
-  color: #888;
+  color: #777;
 }
 .legend-item { display: flex; align-items: center; gap: 5px; }
-.leg-today  { width:12px; height:12px; border-radius:4px; background:rgba(110,175,94,0.4); border:1.5px solid #6eaf5e; }
-.leg-done   { width:12px; height:12px; border-radius:4px; background:rgba(110,175,94,0.2); }
-.leg-dot    { width:8px; height:8px; border-radius:50%; background:#ffbd4b; }
+.leg-today  { width: 12px; height: 12px; border-radius: 4px; background: rgba(110,175,94,0.38); border: 1.5px solid var(--green); }
+.leg-done   { width: 12px; height: 12px; border-radius: 4px; background: rgba(110,175,94,0.18); }
+.leg-dot    { width: 8px;  height: 8px;  border-radius: 50%; background: var(--gold); }
 
-/* ── לוח עברי (כותרת תאריך) ── */
+/* ─── Hebrew date card ─── */
 .hebrew-date-card {
   display: flex;
   flex-direction: column;
@@ -454,38 +587,13 @@ footer.app-footer {
   border: 1px solid rgba(255, 189, 75, 0.2);
   margin-bottom: 8px;
 }
-
 .hdc-top { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-
-.hdc-day-name {
-  font-size: 0.9rem;
-  color: #ffbd4b;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.hdc-hebrew {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
-}
-
-.hdc-gregorian {
-  font-size: 0.95rem;
-  color: #aaa;
-}
-
-.hdc-events {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
+.hdc-day-name { font-size: 0.9rem; color: var(--gold); font-weight: 600; letter-spacing: 0.05em; }
+.hdc-hebrew   { font-size: 2.2rem; font-weight: 700; color: #fff; line-height: 1.2; }
+.hdc-gregorian { font-size: 0.95rem; color: #aaa; }
+.hdc-events { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .hdc-event-pill {
-  background: rgba(110, 175, 94, 0.18);
+  background: var(--green-dim);
   color: #b8f0a8;
   border: 1px solid rgba(110, 175, 94, 0.35);
   border-radius: 20px;
@@ -493,68 +601,84 @@ footer.app-footer {
   font-size: 0.88rem;
 }
 
-/* ══════════════════════════════
-   אנימציות
-══════════════════════════════ */
+/* ════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════ */
 
-/* 1. כניסת עמוד */
-.app-content section {
-  animation: fadeInUp 0.38s ease both;
-}
+/* Page entrance */
+.app-content section { animation: fadeInUp 0.38s ease both; }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* כרטיסים בפיגור */
-.daily-grid > :nth-child(1) { animation: fadeInUp 0.38s 0.05s ease both; }
-.daily-grid > :nth-child(2) { animation: fadeInUp 0.38s 0.13s ease both; }
-.notes-card                  { animation: fadeInUp 0.38s 0.20s ease both; }
-.quiz-stack > :nth-child(n)  { animation: fadeInUp 0.35s calc(0.06s * var(--i, 1)) ease both; }
+/* Staggered card grids */
+.features-grid > :nth-child(1) { animation: fadeInUp 0.4s 0.05s  ease both; }
+.features-grid > :nth-child(2) { animation: fadeInUp 0.4s 0.12s  ease both; }
+.features-grid > :nth-child(3) { animation: fadeInUp 0.4s 0.19s  ease both; }
+.features-grid > :nth-child(4) { animation: fadeInUp 0.4s 0.26s  ease both; }
+.daily-grid > :nth-child(1)    { animation: fadeInUp 0.4s 0.06s  ease both; }
+.daily-grid > :nth-child(2)    { animation: fadeInUp 0.4s 0.15s  ease both; }
+.notes-card                    { animation: fadeInUp 0.4s 0.22s  ease both; }
 
-/* 2. ניצוץ ירוק — סימון יום */
-@keyframes completedPulse {
-  0%   { box-shadow: 0 24px 70px rgba(0,0,0,0.16); border-color: rgba(255,255,255,0.08); }
-  35%  { box-shadow: 0 0 55px rgba(110,175,94,0.55); border-color: rgba(110,175,94,0.75); }
-  100% { box-shadow: 0 24px 70px rgba(0,0,0,0.16); border-color: rgba(255,255,255,0.08); }
+/* Float — for emoji icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-7px); }
 }
 
+/* Gold glow pulse */
+@keyframes goldGlow {
+  0%, 100% { text-shadow: 0 0 8px  rgba(255, 189, 75, 0.2); }
+  50%       { text-shadow: 0 0 28px rgba(255, 189, 75, 0.6); }
+}
+
+/* Green pulse on day completion */
+@keyframes completedPulse {
+  0%   { box-shadow: var(--shadow-card);         border-color: var(--border); }
+  35%  { box-shadow: 0 0 55px rgba(110, 175, 94, 0.58), var(--shadow-card); border-color: rgba(110, 175, 94, 0.75); }
+  100% { box-shadow: var(--shadow-card);         border-color: var(--border); }
+}
 .just-completed { animation: completedPulse 1.3s ease; }
 
-/* 3. קפיצת ניקוד */
+/* Score bump */
 @keyframes scoreBump {
   0%   { transform: scale(1);    color: inherit; }
-  40%  { transform: scale(1.38); color: #6eaf5e; }
+  40%  { transform: scale(1.4);  color: var(--green); }
   100% { transform: scale(1);    color: inherit; }
 }
-
 .score-bump {
   display: inline-block;
   animation: scoreBump 0.75s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-/* 4. קפיצת רצף */
+/* Streak bounce */
 @keyframes streakBounce {
   0%   { transform: scale(1); }
-  35%  { transform: scale(1.45); }
-  65%  { transform: scale(0.88); }
+  35%  { transform: scale(1.46); }
+  65%  { transform: scale(0.87); }
   100% { transform: scale(1); }
 }
-
 .streak-bounce {
   display: inline-block;
   animation: streakBounce 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-/* 5. לחיצת כפתור */
-button.primary:active,
-button.secondary:active {
-  transform: scale(0.94) !important;
-  transition: transform 0.07s ease !important;
+/* Quiz option correct flash */
+@keyframes optCorrect {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }
 
-/* ── Progress Bar ── */
+/* Slide down for banners */
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* ─── Progress Bar ─── */
 .progress-bar-wrap {
   margin-bottom: 20px;
 }
@@ -568,7 +692,7 @@ button.secondary:active {
 
 .progress-pct {
   font-weight: 700;
-  color: #ffbd4b;
+  color: var(--gold);
   font-size: 0.95rem;
 }
 
@@ -576,64 +700,55 @@ button.secondary:active {
   position: relative;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  height: 14px;
+  height: 12px;
   overflow: visible;
 }
 
 .progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ffbd4b 0%, #6eaf5e 100%);
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, var(--gold) 0%, var(--green) 100%);
+  transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 0;
+  box-shadow: 0 0 10px rgba(255, 189, 75, 0.35);
 }
 
-.progress-markers {
-  position: relative;
-  height: 0;
-}
+.progress-markers { position: relative; height: 0; }
 
 .progress-marker {
   position: absolute;
-  top: -19px;
-  width: 4px;
-  height: 14px;
-  background: rgba(255, 255, 255, 0.25);
+  top: -17px;
+  width: 3px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
   transform: translateX(50%);
   transition: background 0.3s;
 }
+.progress-marker.reached { background: rgba(255, 255, 255, 0.75); }
 
-.progress-marker.reached {
-  background: rgba(255, 255, 255, 0.7);
-}
+.progress-count { margin: 8px 0 0; font-size: 0.85rem; color: var(--text-soft); }
 
-.progress-count {
-  margin: 8px 0 0;
-  font-size: 0.85rem;
-  color: #bac9dc;
-}
-
-/* ── Milestone banner ── */
+/* ─── Milestone banner ─── */
 .milestone-banner {
   background: linear-gradient(135deg, #3a9e5e, #2a7e46);
   color: #fff;
-  padding: 16px 32px;
+  padding: 14px 32px;
   display: flex;
   align-items: center;
   gap: 16px;
   animation: slideDown 0.35s ease;
+  border-bottom: 1px solid rgba(110, 175, 94, 0.3);
 }
 
-@keyframes slideDown {
-  from { transform: translateY(-100%); opacity: 0; }
-  to   { transform: translateY(0);     opacity: 1; }
+.milestone-emoji {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  animation: float 2.4s ease-in-out infinite;
 }
 
-.milestone-emoji { font-size: 2.2rem; flex-shrink: 0; }
-
-.milestone-text strong { display: block; font-size: 1.1rem; }
-.milestone-text p      { margin: 3px 0 0; font-size: 0.92rem; opacity: 0.9; }
+.milestone-text strong { display: block; font-size: 1.05rem; }
+.milestone-text p      { margin: 3px 0 0; font-size: 0.9rem; opacity: 0.9; }
 
 .milestone-close {
   background: none;
@@ -644,44 +759,48 @@ button.secondary:active {
   margin-right: auto;
   padding: 0;
   line-height: 1;
+  opacity: 0.8;
 }
+.milestone-close:hover { opacity: 1; }
 
-/* ── Streak display ── */
+/* ─── Streak display ─── */
 .streak-row   { display: flex; align-items: baseline; gap: 8px; }
-.streak-num   { font-size: 2.4rem; font-weight: 800; color: #ffbd4b; line-height: 1; }
-.streak-unit  { font-size: 0.9rem; color: #bac9dc; }
-.streak-badge { font-size: 1.5rem; }
+.streak-num   { font-size: 2.6rem; font-weight: 900; color: var(--gold); line-height: 1; animation: goldGlow 3s ease-in-out infinite; }
+.streak-unit  { font-size: 0.9rem; color: var(--text-soft); }
+.streak-badge { font-size: 1.6rem; }
 
-/* ── Milestone progress box ── */
+/* ─── Milestone progress box ─── */
 .milestone-progress {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.035);
   border-radius: 14px;
+  border: 1px solid var(--border);
   padding: 12px 16px;
   margin-bottom: 18px;
 }
-.milestone-progress p { margin: 6px 0 0; font-size: 0.9rem; color: #c5d1e3; line-height: 1.5; }
-.bonus-note           { color: #ffbd4b; font-weight: 600; font-size: 0.85rem; }
+.milestone-progress p { margin: 6px 0 0; font-size: 0.9rem; color: var(--text-soft); line-height: 1.5; }
+.bonus-note           { color: var(--gold); font-weight: 700; font-size: 0.85rem; }
 
-/* ── Parasha name highlight ── */
-.parasha-name  { color: #ffe5ba; font-weight: 700; }
-.parasha-block p { font-size: 0.9rem; color: #c5d1e3; margin: 6px 0 0; }
+/* ─── Parasha ─── */
+.parasha-name    { color: var(--gold-soft); font-weight: 700; }
+.parasha-block p { font-size: 0.9rem; color: var(--text-soft); margin: 6px 0 0; }
 
-/* ── Reminder banner ── */
+/* ─── Reminder banner ─── */
 .reminder-banner {
   background: linear-gradient(135deg, #ffbd4b, #ff8c71);
   color: #161616;
-  padding: 14px 32px;
+  padding: 12px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  animation: slideDown 0.35s ease;
 }
 
 .reminder-cta {
   background: rgba(0, 0, 0, 0.15);
-  padding: 8px 16px;
+  padding: 7px 16px;
   border-radius: 999px;
   color: #161616;
   font-weight: 700;
@@ -698,14 +817,14 @@ button.secondary:active {
   padding: 0;
 }
 
-/* ── Settings page ── */
+/* ─── Settings ─── */
 .settings-toggle {
   display: flex;
   align-items: center;
   gap: 14px;
   cursor: pointer;
   font-size: 1rem;
-  color: #fff;
+  color: var(--text);
   margin-top: 18px;
 }
 
@@ -713,17 +832,17 @@ button.secondary:active {
   width: 22px;
   height: 22px;
   cursor: pointer;
-  accent-color: #ffbd4b;
+  accent-color: var(--gold);
   flex-shrink: 0;
 }
 
 input[type='time'] {
   width: auto;
-  padding: 12px 16px;
+  padding: 11px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--border-2);
   background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  color: var(--text);
   font-size: 1rem;
   margin-top: 8px;
 }
@@ -737,15 +856,13 @@ input[type='time'] {
 
 .stat-number {
   display: block;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
+  font-weight: 800;
   line-height: 1.1;
-  color: #ffbd4b;
+  color: var(--gold);
 }
 
-.stat-unit {
-  font-size: 0.85rem;
-  color: #bac9dc;
-}
+.stat-unit { font-size: 0.85rem; color: var(--text-soft); }
 
 .chitas-grid {
   display: grid;
@@ -755,56 +872,61 @@ input[type='time'] {
 }
 
 .chitas-item {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.038);
   padding: 16px;
   border-radius: 18px;
+  border: 1px solid var(--border);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.chitas-item:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12); }
+
+.chitas-item p { margin: 8px 0 0; font-size: 0.9rem; color: var(--text-soft); }
+
+/* ─── Quiz difficulty pills ─── */
+.pill-קל     { background: rgba(110, 175, 94, 0.18); color: #c8f0b8; border: 1px solid rgba(110,175,94,0.28); }
+.pill-בינוני { background: var(--gold-dim);          color: var(--gold-soft); border: 1px solid rgba(255,189,75,0.28); }
+.pill-קשה    { background: var(--red-dim);           color: #ffd3d3; border: 1px solid rgba(220,90,90,0.28); }
+
+/* ─── Quiz feedback ─── */
+@keyframes feedbackSlide {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-.chitas-item p {
-  margin: 8px 0 0;
-  font-size: 0.9rem;
-  color: #c5d1e3;
+.quiz-feedback {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  animation: feedbackSlide 0.28s ease both;
+  font-weight: 500;
 }
 
-/* ── Quiz difficulty pills ── */
-.pill-קל     { background: rgba(110, 175, 94, 0.2);  color: #c8f0b8; }
-.pill-בינוני { background: rgba(255, 189, 75, 0.2);  color: #ffe5ba; }
-.pill-קשה    { background: rgba(220, 90, 90, 0.2);   color: #ffd3d3; }
+.quiz-feedback.correct { background: var(--green-dim); color: #dff4d6; border: 1px solid rgba(110,175,94,0.25); }
+.quiz-feedback.wrong,
+.quiz-feedback.missing { background: var(--red-dim);   color: #ffd3d3; border: 1px solid rgba(220,90,90,0.25); }
 
-/* ── Quiz result ── */
+/* ─── Quiz result ─── */
+.quiz-footer-card { text-align: center; }
+.result-block     { margin-top: 18px; color: var(--text); }
+
 .result-score {
-  font-size: 3.2rem;
-  font-weight: 800;
-  color: #ffbd4b;
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: var(--gold);
   margin: 0 0 8px;
   line-height: 1;
+  text-shadow: 0 0 30px rgba(255, 189, 75, 0.45);
 }
-.result-max   { font-size: 1.4rem; color: #bac9dc; font-weight: 400; }
-.result-msg   { font-size: 1.1rem; margin: 0 0 6px; }
-.result-record { color: #ffe5ba; font-weight: 700; }
+.result-max    { font-size: 1.4rem; color: var(--text-soft); font-weight: 400; }
+.result-msg    { font-size: 1.1rem; margin: 0 0 6px; }
+.result-record { color: var(--gold-soft); font-weight: 700; }
 
-/* ── Quiz card state colors ── */
-.quiz-card.correct {
-  border-color: rgba(110, 175, 94, 0.45);
-}
+/* ─── Quiz card state colors ─── */
+.quiz-card.correct { border-color: rgba(110, 175, 94, 0.45); background: rgba(110, 175, 94, 0.04); }
+.quiz-card.wrong   { border-color: rgba(220, 90, 90, 0.45); }
+.quiz-card.missing { border-color: rgba(220, 200, 90, 0.35); }
 
-.quiz-card.wrong {
-  border-color: rgba(220, 90, 90, 0.45);
-}
-
-.quiz-card.missing {
-  border-color: rgba(220, 200, 90, 0.35);
-}
-
-/* ── Disabled button ── */
-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* ── Control row (buttons row) ── */
+/* ─── Control row ─── */
 .control-row {
   display: flex;
   gap: 12px;
@@ -812,34 +934,30 @@ button:disabled {
   margin-top: 18px;
 }
 
-/* ── Day-of-week note in daily board ── */
-.day-of-week-note {
-  font-size: 0.85rem;
-  color: #bac9dc;
-  margin: 4px 0 0;
-}
+.day-of-week-note { font-size: 0.85rem; color: var(--text-soft); margin: 4px 0 0; }
 
-/* ── TextViewer — קריאת פסוקים מ-Sefaria ── */
-.text-viewer {
-  margin-top: 12px;
-}
+/* ─── TextViewer ─── */
+.text-viewer { margin-top: 12px; }
 
 .text-viewer-btn {
   display: inline-block;
   font-size: 0.85rem;
   padding: 7px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.07);
-  color: #e8e2d8;
+  border: 1px solid var(--border-2);
+  background: rgba(255, 255, 255, 0.065);
+  color: var(--text-soft);
   cursor: pointer;
-  transition: background 0.18s, transform 0.18s;
+  transition: background 0.18s ease, transform 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   font-family: inherit;
+  font-weight: 500;
 }
 
 .text-viewer-btn:hover {
-  background: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
   transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .text-viewer-panel {
@@ -855,30 +973,20 @@ button:disabled {
 }
 
 .text-viewer-panel::-webkit-scrollbar       { width: 5px; }
-.text-viewer-panel::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
-.text-viewer-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 3px; }
+.text-viewer-panel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.03); }
+.text-viewer-panel::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.13); border-radius: 3px; }
 
-.text-viewer-status {
-  text-align: center;
-  color: #bac9dc;
-  font-size: 0.9rem;
-  padding: 8px 0;
-  margin: 0;
-}
-
-.text-viewer-link {
-  color: #ffbd4b;
-  text-decoration: underline;
-}
+.text-viewer-status { text-align: center; color: var(--text-soft); font-size: 0.9rem; padding: 8px 0; margin: 0; }
+.text-viewer-link   { color: var(--gold); text-decoration: underline; }
 
 .text-section { margin-bottom: 14px; }
 
 .text-section-head {
   font-size: 0.82rem;
-  color: #ffbd4b;
+  color: var(--gold);
   font-weight: 700;
   margin: 14px 0 6px;
-  border-bottom: 1px solid rgba(255, 189, 75, 0.2);
+  border-bottom: 1px solid rgba(255, 189, 75, 0.18);
   padding-bottom: 4px;
 }
 
@@ -888,14 +996,14 @@ button:disabled {
   align-items: flex-start;
   margin: 0 0 7px;
   font-size: 1rem;
-  line-height: 1.75;
+  line-height: 1.8;
   color: #e8e2d8;
 }
 
 .verse-num {
   flex-shrink: 0;
   font-size: 0.7rem;
-  color: #ffbd4b;
+  color: var(--gold);
   font-weight: 700;
   min-width: 22px;
   text-align: center;
@@ -905,10 +1013,12 @@ button:disabled {
   padding: 1px 4px;
 }
 
-/* ── חידון — פריסה חדשה (שאלה אחת בכל פעם) ── */
+/* ════════════════════════════════════════
+   QUIZ — one question at a time
+════════════════════════════════════════ */
 .quiz-progress-bar {
-  height: 6px;
-  background: rgba(255, 255, 255, 0.08);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.07);
   border-radius: 999px;
   margin-bottom: 20px;
   overflow: hidden;
@@ -916,25 +1026,22 @@ button:disabled {
 
 .quiz-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ffbd4b, #6eaf5e);
+  background: linear-gradient(90deg, var(--gold), var(--green));
   border-radius: 999px;
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(255, 189, 75, 0.4);
 }
 
 .quiz-card-main { padding: 32px; }
 
-.quiz-counter {
-  font-size: 0.88rem;
-  color: #888;
-  font-weight: 600;
-}
+.quiz-counter { font-size: 0.88rem; color: var(--text-dim); font-weight: 600; }
 
 .quiz-question {
-  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-size: clamp(1.3rem, 2.5vw, 1.85rem);
   font-weight: 700;
-  margin: 24px 0 28px;
+  margin: 22px 0 26px;
   line-height: 1.5;
-  color: #f7f4ef;
+  color: var(--text);
 }
 
 .quiz-options {
@@ -946,14 +1053,14 @@ button:disabled {
 .quiz-option {
   padding: 18px 16px;
   border-radius: 18px;
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
-  color: #f7f4ef;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
   font-size: 1rem;
   font-weight: 500;
   text-align: center;
   cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
   line-height: 1.4;
   min-height: 64px;
   display: flex;
@@ -962,53 +1069,44 @@ button:disabled {
 }
 
 .quiz-option:hover:not(.quiz-opt-dim):not(.quiz-opt-correct):not(.quiz-opt-wrong) {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
 
 .quiz-opt-correct {
-  border-color: #6eaf5e !important;
-  background: rgba(110, 175, 94, 0.22) !important;
+  border-color: var(--green) !important;
+  background: rgba(110, 175, 94, 0.2) !important;
   color: #dff4d6 !important;
-  animation: optCorrect 0.4s ease both;
+  box-shadow: 0 0 20px rgba(110, 175, 94, 0.22) !important;
+  animation: optCorrect 0.45s ease both;
 }
 
 .quiz-opt-wrong {
-  border-color: #dc5a5a !important;
-  background: rgba(220, 90, 90, 0.22) !important;
+  border-color: var(--red) !important;
+  background: rgba(220, 90, 90, 0.2) !important;
   color: #ffd3d3 !important;
 }
 
 .quiz-opt-dim {
-  opacity: 0.35;
+  opacity: 0.32;
   cursor: default;
   pointer-events: none;
 }
 
-@keyframes optCorrect {
-  0%   { transform: scale(1); }
-  45%  { transform: scale(1.04); }
-  100% { transform: scale(1); }
-}
-
-/* ── תוצאות חידון ── */
-.quiz-result-card {
-  text-align: center;
-  padding: 40px 28px;
-}
+/* ─── Quiz results ─── */
+.quiz-result-card { text-align: center; padding: 44px 28px; }
 
 .result-emoji {
-  font-size: 3.5rem;
+  font-size: 3.8rem;
   margin-bottom: 16px;
   display: block;
+  animation: float 3s ease-in-out infinite;
 }
 
-/* ── סיכום שאלות ── */
-.quiz-summary-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 8px;
-}
+/* ─── Quiz summary list ─── */
+.quiz-summary-list { display: grid; gap: 10px; margin-top: 8px; }
 
 .quiz-summary-item {
   display: flex;
@@ -1016,36 +1114,25 @@ button:disabled {
   gap: 12px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.038);
+  border: 1px solid var(--border);
+  transition: background 0.15s ease;
 }
+.quiz-summary-item:hover { background: rgba(255, 255, 255, 0.06); }
+.quiz-summary-item.correct { border-right: 3px solid var(--green); }
+.quiz-summary-item.wrong   { border-right: 3px solid var(--red); }
 
-.quiz-summary-item.correct { border-right: 3px solid #6eaf5e; }
-.quiz-summary-item.wrong   { border-right: 3px solid #dc5a5a; }
-
-.summary-icon {
-  font-size: 1.1rem;
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.quiz-summary-item.correct .summary-icon { color: #6eaf5e; }
-.quiz-summary-item.wrong   .summary-icon { color: #dc5a5a; }
+.summary-icon { font-size: 1.1rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+.quiz-summary-item.correct .summary-icon { color: var(--green); }
+.quiz-summary-item.wrong   .summary-icon { color: var(--red); }
 
 .summary-body { flex: 1; }
+.summary-q   { margin: 0; font-size: 0.95rem; color: #f0ece4; }
+.summary-ans { margin: 4px 0 0; font-size: 0.85rem; color: var(--gold); }
 
-.summary-q {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #f0ece4;
-}
-
-.summary-ans {
-  margin: 4px 0 0;
-  font-size: 0.85rem;
-  color: #ffbd4b;
-}
-
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
 @media (max-width: 900px) {
   .daily-grid,
   .stats-grid,
@@ -1056,11 +1143,20 @@ button:disabled {
 
 @media (max-width: 720px) {
   .app-header {
-    flex-direction: column;
-    align-items: stretch;
+    padding: 0 16px;
+    height: 58px;
   }
 
-  .app-nav {
-    justify-content: center;
-  }
+  .brand-name { font-size: 1rem; }
+
+  .app-nav { gap: 4px; }
+  .app-nav a { padding: 7px 12px; font-size: 0.82rem; }
+
+  .app-content { padding: 20px 16px; }
+
+  .card { border-radius: 20px; padding: 20px; }
+
+  .hero-card { padding: 26px 20px; }
+
+  .quiz-options { grid-template-columns: 1fr; }
 }

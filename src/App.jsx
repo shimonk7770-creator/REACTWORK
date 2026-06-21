@@ -44,25 +44,16 @@ function App() {
       )}
 
       <header className="app-header">
-        <div className="brand-group">
-          <span className="brand-badge">חת״ת יומי</span>
-          <h1>למוטיבציה יומיומית בחומש, תהילים ותניא</h1>
-          <p>עוקבים אחרי היום הנוכחי, צוברים ניקוד ונשארים ברצף עם עיצוב מודרני בעברית.</p>
-        </div>
+        <Link to="/" className="brand-logo">
+          <span className="brand-icon">📖</span>
+          <span className="brand-name">חת״ת יומי</span>
+        </Link>
 
         <nav className="app-nav">
-          <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>
-            בית
-          </NavLink>
-          <NavLink to="/daily" className={({ isActive }) => (isActive ? 'active' : '')}>
-            לוח יומי
-          </NavLink>
-          <NavLink to="/quiz" className={({ isActive }) => (isActive ? 'active' : '')}>
-            חידון פרשה
-          </NavLink>
-          <NavLink to="/settings" className={({ isActive }) => (isActive ? 'active' : '')}>
-            הגדרות
-          </NavLink>
+          <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>בית</NavLink>
+          <NavLink to="/daily" className={({ isActive }) => (isActive ? 'active' : '')}>לוח יומי</NavLink>
+          <NavLink to="/quiz" className={({ isActive }) => (isActive ? 'active' : '')}>חידון פרשה</NavLink>
+          <NavLink to="/settings" className={({ isActive }) => (isActive ? 'active' : '')}>הגדרות</NavLink>
         </nav>
       </header>
 
