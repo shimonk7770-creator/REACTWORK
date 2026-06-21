@@ -28,8 +28,21 @@ function DailyBoard() {
   const [justCompleted,     setJustCompleted]     = useState(false);
   const [scoreAnim,         setScoreAnim]         = useState(false);
   const [streakAnim,        setStreakAnim]         = useState(false);
+  const [chumashRef,        setChumashRef]        = useState(null);
 
   useEffect(() => { document.title = 'לוח יומי | חת"ת יומי'; }, []);
+
+  useEffect(() => {
+    fetch('https://www.sefaria.org/api/calendars')
+      .then((r) => r.json())
+      .then((data) => {
+        const item = data.calendar_items?.find(
+          (c) => c.title?.en === 'Parashat Hashavua'
+        );
+        if (item?.ref) setChumashRef(item.ref);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -141,15 +154,9 @@ function DailyBoard() {
               <span className="label">חומש — פרשת <span className="parasha-name">{parasha.name}</span></span>
               <p>{chumash.label} · יום {DAY_NAMES[todayDayOfWeek]} · ספר {parasha.book}</p>
               <p className="text-soft" style={{ fontSize: '0.88rem', marginTop: '4px' }}>{chumash.description}</p>
-              <a
-                className="text-viewer-btn"
-                href="https://www.chabad.org.il/Lessons/Lessons.asp?CategoryID=175"
-                target="_blank"
-                rel="noreferrer"
-                style={{ display: 'inline-block', marginTop: '10px', textDecoration: 'none' }}
-              >
-                📖 קרא ב-Chabad.org.il ↗
-              </a>
+              {chumashRef && (
+                <TextViewer sefariaRef={chumashRef} fallbackLabel="Sefaria.org" />
+              )}
             </div>
             <div>
               <span className="label">תהילים — פרקים {current.tehillim}</span>
