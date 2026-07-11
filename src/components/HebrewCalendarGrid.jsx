@@ -7,6 +7,23 @@ const MONTHS_HE = [
   'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר',
 ];
 
+// מסיר ניקוד (טעמי מקרא ותנועות, ֑-ׇ) כדי שאפשר יהיה
+// להשוות/לחתוך מחרוזות עבריות מנוקדות שמחזיר hebcal (למשל
+// "פָּרָשַׁת דְּבָרִים"), תוך שמירה על המקף העברי (maqaf, ־)
+// כמקף רגיל (למשל "מטות־מסעי"). נכתב עם \uXXXX מפורש ולא תווים
+// גולמיים כדי להימנע מבעיות נורמליזציה של combining marks.
+// משווה לפי קוד-נקודה מספרי (לא regex עם תווי ניקוד גולמיים בקוד) —
+// כדי להימנע מבעיות קידוד/נורמליזציה של combining marks עבריים.
+const MAQAF_CODE = 0x05be;
+const NIKUD_MIN = 0x0591;
+const NIKUD_MAX = 0x05c7;
+const stripNikud = (s) => Array.from(s).map((ch) => {
+  const code = ch.codePointAt(0);
+  if (code === MAQAF_CODE) return '-';
+  if (code >= NIKUD_MIN && code <= NIKUD_MAX) return '';
+  return ch;
+}).join('');
+
 function getMonthEvents(year, month) {
   const start = new HDate(new Date(year, month, 1));
   const end   = new HDate(new Date(year, month + 1, 0));
@@ -89,6 +106,8 @@ function HebrewCalendarGrid({ completedDays = new Set(), selectedDay = null, onS
           const dayEvts    = events[key] || [];
           const isSelected = selectedDay != null && hdate.getDate() === selectedDay;
           const clickable  = typeof onSelectDay === 'function';
+          const parashaEvt = isSat ? dayEvts.find((e) => stripNikud(e).startsWith('פרשת')) : null;
+          const parashaName = parashaEvt ? stripNikud(parashaEvt).replace(/^פרשת\s*/, '') : null;
 
           return (
             <div
@@ -109,6 +128,7 @@ function HebrewCalendarGrid({ completedDays = new Set(), selectedDay = null, onS
               <span className="hcal-greg">{day}</span>
               <span className="hcal-heb">{heDay}</span>
               {isDone && <span className="hcal-check">✓</span>}
+              {parashaName && <span className="hcal-parasha">{parashaName}</span>}
               {dayEvts.length > 0 && (
                 <span className="hcal-dot" title={dayEvts.join(' · ')} />
               )}

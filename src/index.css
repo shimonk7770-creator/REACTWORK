@@ -646,7 +646,12 @@ footer.app-footer {
 .hcal-cell.clickable:focus-visible { box-shadow: 0 0 0 2px var(--gold); }
 
 .hcal-cell.empty   { background: transparent; }
-.hcal-cell.shabbat { background: rgba(245, 166, 35, 0.08); }
+.hcal-cell.shabbat {
+  background: rgba(245, 166, 35, 0.08);
+  aspect-ratio: auto;
+  min-height: 70px;
+  padding: 4px 2px;
+}
 .hcal-cell.today {
   background: rgba(47, 168, 118, 0.18);
   border: 2px solid var(--green);
@@ -660,6 +665,16 @@ footer.app-footer {
 
 .hcal-greg { font-size: 1rem; font-weight: 600; color: var(--text); line-height: 1; }
 .hcal-heb  { font-size: 0.68rem; color: var(--text-dim); margin-top: 2px; }
+.hcal-parasha {
+  font-size: 0.52rem;
+  line-height: 1.15;
+  color: var(--gold-soft);
+  font-weight: 700;
+  text-align: center;
+  margin-top: 3px;
+  word-break: break-word;
+  max-width: 100%;
+}
 .hcal-check {
   position: absolute;
   top: 3px;

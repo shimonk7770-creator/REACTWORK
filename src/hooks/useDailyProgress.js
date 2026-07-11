@@ -10,15 +10,30 @@ export const MILESTONES = [
   { days: 30, bonus: 200, emoji: '🏆', label: 'חודש שלם!'    },
 ];
 
+function loadStoredState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
 // הוק משותף לניהול "יום נבחר" + רצף/ניקוד — משמש בכל עמודי
 // חומש/תהילים/תניא, כך ששלושתם מדברים על אותו יום ואותו רצף לימוד.
 // ה"יום" נגזר תמיד מהתאריך העברי (HDate), לא מהתאריך הלועזי.
+//
+// המצב נטען מ-localStorage ישירות ב-useState הראשוני (לא ב-useEffect) —
+// כדי שהיום הנבחר יישאר עקבי גם במעבר בין עמודי חומש/תהילים/תניא, בלי
+// "הבזק" של היום הנוכחי שדורס את השמירה לפני שהיא נטענת.
 export function useDailyProgress() {
-  const [selectedDate,      setSelectedDate]      = useState(() => new Date());
-  const [completedDays,     setCompletedDays]     = useState(new Set());
-  const [streak,            setStreak]            = useState(0);
-  const [score,             setScore]             = useState(0);
-  const [lastCompletedDate, setLastCompletedDate] = useState(null);
+  const [selectedDate,      setSelectedDate]      = useState(() => {
+    const saved = loadStoredState();
+    return saved.selectedDateISO ? new Date(saved.selectedDateISO) : new Date();
+  });
+  const [completedDays,     setCompletedDays]     = useState(() => new Set(loadStoredState().completedDays || []));
+  const [streak,            setStreak]            = useState(() => loadStoredState().streak || 0);
+  const [score,             setScore]             = useState(() => loadStoredState().score || 0);
+  const [lastCompletedDate, setLastCompletedDate] = useState(() => loadStoredState().lastCompletedDate ?? null);
   const [milestoneAlert,    setMilestoneAlert]    = useState(null);
   const [justCompleted,     setJustCompleted]     = useState(false);
   const [scoreAnim,         setScoreAnim]         = useState(false);
@@ -30,19 +45,14 @@ export function useDailyProgress() {
   const dayOfWeek = selectedDate.getDay();
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    setCompletedDays(new Set(saved.completedDays || []));
-    setStreak(saved.streak || 0);
-    setScore(saved.score || 0);
-    setLastCompletedDate(saved.lastCompletedDate ?? null);
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ completedDays: [...completedDays], streak, score, lastCompletedDate })
+      JSON.stringify({
+        completedDays: [...completedDays], streak, score, lastCompletedDate,
+        selectedDateISO: selectedDate.toISOString(),
+      })
     );
-  }, [completedDays, streak, score, lastCompletedDate]);
+  }, [completedDays, streak, score, lastCompletedDate, selectedDate]);
 
   const completed = completedDays.has(dayInfo.day);
   const nextMilestone = MILESTONES.find((m) => m.days > streak);
