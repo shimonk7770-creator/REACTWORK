@@ -1222,8 +1222,47 @@ input[type='time'] {
   pointer-events: none;
 }
 
+/* ─── Difficulty selector ─── */
+.difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.difficulty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 36px 24px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  font-family: inherit;
+}
+.difficulty-card:hover { transform: translateY(-4px); }
+.difficulty-card h3 { margin: 4px 0 0; font-size: 1.3rem; color: var(--text); }
+.difficulty-card p  { margin: 0; color: var(--text-soft); font-size: 0.9rem; }
+.difficulty-icon    { font-size: 2.6rem; animation: float 3s ease-in-out infinite; }
+
+.difficulty-card.difficulty-קל       { border-color: rgba(47, 168, 118, 0.35); }
+.difficulty-card.difficulty-קל:hover      { box-shadow: 0 20px 45px rgba(47, 168, 118, 0.25); }
+.difficulty-card.difficulty-בינוני   { border-color: rgba(245, 166, 35, 0.35); }
+.difficulty-card.difficulty-בינוני:hover  { box-shadow: 0 20px 45px rgba(245, 166, 35, 0.25); }
+.difficulty-card.difficulty-קשה      { border-color: rgba(226, 83, 107, 0.35); }
+.difficulty-card.difficulty-קשה:hover     { box-shadow: 0 20px 45px rgba(226, 83, 107, 0.25); }
+
 /* ─── Quiz results ─── */
-.quiz-result-card { text-align: center; padding: 44px 28px; }
+.quiz-result-card { text-align: center; padding: 44px 28px; position: relative; overflow: hidden; }
+
+.confetti-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+
+.quiz-saying { margin-top: 16px; color: var(--text-soft); font-style: italic; font-size: 0.95rem; }
 
 .result-emoji {
   font-size: 3.8rem;

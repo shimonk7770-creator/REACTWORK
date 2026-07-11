@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const SETTINGS_KEY = 'reactwork-settings';
 const DAILY_KEY = 'reactwork-daily-state';
-const QUIZ_KEY = 'reactwork-quiz-best';
+const QUIZ_DIFFICULTIES = ['קל', 'בינוני', 'קשה'];
 
 function Settings() {
   useEffect(() => { document.title = 'הגדרות | חת"ת יומי'; }, []);
@@ -17,7 +17,9 @@ function Settings() {
     if (s.reminderTime) setReminderTime(s.reminderTime);
 
     const d = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
-    const quizBest = parseInt(localStorage.getItem(QUIZ_KEY) || '0', 10);
+    const quizBest = QUIZ_DIFFICULTIES.reduce((sum, level) => {
+      return sum + parseInt(localStorage.getItem(`reactwork-quiz-best:${level}`) || '0', 10);
+    }, 0);
     setStats({
       streak: d.streak || 0,
       score: d.score || 0,
@@ -60,7 +62,7 @@ function Settings() {
           </div>
           <div className="stat-row">
             <div className="progress-block">
-              <span className="small-label">שיא חידון</span>
+              <span className="small-label">סה״כ שיאי חידון (3 רמות)</span>
               <strong className="stat-number">{stats.quizBest}</strong>
               <span className="stat-unit">נקודות</span>
             </div>

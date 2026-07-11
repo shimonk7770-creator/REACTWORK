@@ -2,15 +2,33 @@ import { useEffect, useRef, useState } from 'react';
 import { getQuestionsForParasha } from '../data/parashaQuestions.js';
 import { getCurrentParasha } from '../data/parashaData.js';
 
-const QUIZ_STORAGE_KEY = 'reactwork-quiz-best';
 const QUESTIONS_PER_ROUND = 10;
 
 const POINTS = { קל: 5, בינוני: 10, קשה: 15 };
 
-function getDifficulty(idx) {
-  if (idx < 6)  return 'קל';
-  if (idx < 12) return 'בינוני';
-  return 'קשה';
+const DIFFICULTY_INFO = {
+  קל:     { icon: '🌱', desc: 'שאלות בסיסיות להתחלה נעימה' },
+  בינוני: { icon: '⚡', desc: 'רמה מאתגרת אך נגישה לרוב הלומדים' },
+  קשה:    { icon: '🔥', desc: 'לבקיאי הפרשה — הכי מאתגר' },
+};
+
+const BADGES = [
+  { min: 1,    emoji: '🏆', text: 'ציון מושלם!' },
+  { min: 0.8,  emoji: '🌟', text: 'כמעט מושלם!' },
+  { min: 0.6,  emoji: '👍', text: 'עבודה טובה!' },
+  { min: 0,    emoji: '📖', text: 'כדאי לתרגל עוד קצת' },
+];
+
+const SAYINGS = [
+  'כל שאלה שנענית היא עוד צעד בהבנת הפרשה.',
+  '"יגעת ומצאת — תאמין" — ההתמדה משתלמת.',
+  'עוד סבב אחד ואתם ממש בקיאים!',
+  'תורה נקנית בחזרה — כל סבב נוסף מחזק את הזיכרון.',
+  'כל הכבוד על ההשתתפות — זה כבר ניצחון.',
+];
+
+function pickSaying() {
+  return SAYINGS[Math.floor(Math.random() * SAYINGS.length)];
 }
 
 function shuffle(arr) {
@@ -22,50 +40,71 @@ function shuffle(arr) {
   return a;
 }
 
-function seenStorageKey(parashaName) {
-  return `reactwork-quiz-seen:${parashaName}`;
+// מחלק את הבנק לשלישים לפי מיקום — כך שכל רמת קושי מקבלת נתח יחסי,
+// גם כשמדובר בבנק מאוחד של שבת כפולה (למשל מטות–מסעי).
+function tierForIndex(idx, poolLength) {
+  const third = poolLength / 3;
+  if (idx < third)     return 'קל';
+  if (idx < third * 2) return 'בינוני';
+  return 'קשה';
 }
 
-function loadSeen(parashaName) {
+function seenStorageKey(parashaName, difficulty) {
+  return `reactwork-quiz-seen:${parashaName}:${difficulty}`;
+}
+
+function bestStorageKey(difficulty) {
+  return `reactwork-quiz-best:${difficulty}`;
+}
+
+function loadSeen(parashaName, difficulty) {
   try {
-    return new Set(JSON.parse(localStorage.getItem(seenStorageKey(parashaName)) || '[]'));
+    return new Set(JSON.parse(localStorage.getItem(seenStorageKey(parashaName, difficulty)) || '[]'));
   } catch {
     return new Set();
   }
 }
 
-function saveSeen(parashaName, seenSet) {
-  localStorage.setItem(seenStorageKey(parashaName), JSON.stringify([...seenSet]));
+function saveSeen(parashaName, difficulty, seenSet) {
+  localStorage.setItem(seenStorageKey(parashaName, difficulty), JSON.stringify([...seenSet]));
 }
 
-// בונה סבב חדש שמעדיף שאלות שעדיין לא נשאלו על פרשה זו. כשכל הבנק
-// נוצל — המחזור מתאפס וממשיכים משאלות "טריות" שוב.
-function buildRound(parashaName, seen) {
+// בונה סבב של 10 שאלות מתוך רמת הקושי הנבחרת בלבד, מעדיף שאלות טריות.
+// אם לרמה יש פחות מ-10 שאלות בבנק — ממלאים עד 10 בחזרות (מעורבבות),
+// כדי שהחוויה תמיד תהיה 10 שאלות מלאות.
+function buildRound(parashaName, difficulty, seen) {
   const pool = getQuestionsForParasha(parashaName);
-  const allIndices = shuffle([...Array(pool.length).keys()]);
-  const unseen = allIndices.filter((i) => !seen.has(i));
+  const tierIndices = pool.map((_, i) => i).filter((i) => tierForIndex(i, pool.length) === difficulty);
+  const shuffledTier = shuffle(tierIndices);
+  const unseen = shuffledTier.filter((i) => !seen.has(i));
 
   let chosenIndices;
   let nextSeen;
   if (unseen.length >= QUESTIONS_PER_ROUND) {
     chosenIndices = unseen.slice(0, QUESTIONS_PER_ROUND);
     nextSeen = new Set([...seen, ...chosenIndices]);
-  } else {
-    // לא נשארו מספיק שאלות טריות — מתחילים מחזור חדש
-    chosenIndices = allIndices.slice(0, Math.min(QUESTIONS_PER_ROUND, allIndices.length));
+  } else if (tierIndices.length >= QUESTIONS_PER_ROUND) {
+    chosenIndices = shuffledTier.slice(0, QUESTIONS_PER_ROUND);
     nextSeen = new Set(chosenIndices);
+  } else {
+    // הרמה עצמה מכילה פחות מ-10 שאלות ייחודיות — ממלאים עם חזרות
+    const filled = [];
+    while (filled.length < QUESTIONS_PER_ROUND) filled.push(...shuffle(tierIndices));
+    chosenIndices = filled.slice(0, QUESTIONS_PER_ROUND);
+    nextSeen = new Set(tierIndices);
   }
 
-  const questions = chosenIndices.map((origIdx) => {
+  const questions = chosenIndices.map((origIdx, pos) => {
     const item = pool[origIdx];
     const wrongPool = pool.filter((_, i) => i !== origIdx);
     const wrongAnswers = shuffle(wrongPool).slice(0, 3).map((w) => w.a);
     return {
+      uid: pos,
       id: origIdx,
       question: item.q,
       answer: item.a,
       options: shuffle([item.a, ...wrongAnswers]),
-      difficulty: getDifficulty(origIdx),
+      difficulty,
     };
   });
 
@@ -77,13 +116,9 @@ function Quiz() {
 
   const parasha = getCurrentParasha();
 
-  const seenRef = useRef(loadSeen(parasha.name));
-  const [questions, setQuestions] = useState(() => {
-    const { questions: qs, nextSeen } = buildRound(parasha.name, seenRef.current);
-    seenRef.current = nextSeen;
-    saveSeen(parasha.name, nextSeen);
-    return qs;
-  });
+  const [difficulty, setDifficulty] = useState(null);
+  const seenRef = useRef(new Set());
+  const [questions, setQuestions] = useState([]);
   const [current,   setCurrent]   = useState(0);
   const [selected,  setSelected]  = useState(null);
   const [revealed,  setRevealed]  = useState(false);
@@ -93,19 +128,34 @@ function Quiz() {
   const [bestScore, setBestScore] = useState(0);
   const [scoreAnim, setScoreAnim] = useState(false);
   const [isNewBest, setIsNewBest] = useState(false);
+  const [saying,    setSaying]    = useState('');
 
-  useEffect(() => {
-    const saved = parseInt(localStorage.getItem(QUIZ_STORAGE_KEY) || '0', 10);
-    setBestScore(saved);
-  }, []);
+  const startQuiz = (level) => {
+    seenRef.current = loadSeen(parasha.name, level);
+    const { questions: qs, nextSeen } = buildRound(parasha.name, level, seenRef.current);
+    seenRef.current = nextSeen;
+    saveSeen(parasha.name, level, nextSeen);
+
+    setDifficulty(level);
+    setQuestions(qs);
+    setCurrent(0);
+    setSelected(null);
+    setRevealed(false);
+    setScore(0);
+    setResults([]);
+    setDone(false);
+    setIsNewBest(false);
+    setBestScore(parseInt(localStorage.getItem(bestStorageKey(level)) || '0', 10));
+  };
 
   useEffect(() => {
     if (!done) return;
-    const saved = parseInt(localStorage.getItem(QUIZ_STORAGE_KEY) || '0', 10);
+    setSaying(pickSaying());
+    const saved = parseInt(localStorage.getItem(bestStorageKey(difficulty)) || '0', 10);
     if (score > saved) {
       setBestScore(score);
       setIsNewBest(true);
-      localStorage.setItem(QUIZ_STORAGE_KEY, String(score));
+      localStorage.setItem(bestStorageKey(difficulty), String(score));
     }
   }, [done]);
 
@@ -135,56 +185,90 @@ function Quiz() {
     }
   };
 
-  const restart = () => {
-    const { questions: qs, nextSeen } = buildRound(parasha.name, seenRef.current);
-    seenRef.current = nextSeen;
-    saveSeen(parasha.name, nextSeen);
-    setQuestions(qs);
-    setCurrent(0);
-    setSelected(null);
-    setRevealed(false);
-    setScore(0);
-    setResults([]);
-    setDone(false);
-    setIsNewBest(false);
-  };
+  const restart = () => startQuiz(difficulty);
+  const chooseOtherLevel = () => setDifficulty(null);
 
-  const maxScore = questions.reduce((s, q) => s + POINTS[q.difficulty], 0);
+  const maxScore = questions.length * POINTS[difficulty];
   const progress = results.length / QUESTIONS_PER_ROUND;
+  const pct = maxScore ? score / maxScore : 0;
+  const badge = BADGES.find((b) => pct >= b.min);
+  const showConfetti = done && pct >= 0.8;
 
-  const resultMsg = () => {
-    const pct = score / maxScore;
-    if (pct === 1)   return { emoji: '🏆', text: 'מושלם! כל התשובות נכונות!' };
-    if (pct >= 0.75) return { emoji: '🌟', text: 'יפה מאוד! כמעט הכל נכון.' };
-    if (pct >= 0.5)  return { emoji: '👍', text: 'לא רע, אבל יש עוד מה ללמוד.' };
-    return                   { emoji: '📖', text: 'כדאי לחזור על החומר ולנסות שוב.' };
-  };
-
-  if (done) {
-    const msg = resultMsg();
+  // ─── מסך בחירת רמת קושי ───
+  if (!difficulty) {
     return (
       <section>
         <div className="card page-intro-card">
           <div>
             <span className="pill">חידון</span>
+            <h2>בחרו רמת קושי</h2>
+            <p className="text-soft">פרשת {parasha.name} · 10 שאלות בכל רמה</p>
+          </div>
+        </div>
+
+        <div className="difficulty-grid">
+          {Object.keys(DIFFICULTY_INFO).map((level) => (
+            <button
+              key={level}
+              className={`difficulty-card difficulty-${level}`}
+              onClick={() => startQuiz(level)}
+            >
+              <span className="difficulty-icon">{DIFFICULTY_INFO[level].icon}</span>
+              <h3>{level}</h3>
+              <p>{DIFFICULTY_INFO[level].desc}</p>
+              <span className="pill">{POINTS[level]} נק׳ לשאלה</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // ─── מסך תוצאות ───
+  if (done) {
+    return (
+      <section>
+        <div className="card page-intro-card">
+          <div>
+            <span className={`pill pill-difficulty pill-${difficulty}`}>{difficulty}</span>
             <h2>תוצאות הסבב</h2>
             <p className="text-soft">פרשת {parasha.name}</p>
           </div>
           {bestScore > 0 && (
             <div className="summary-badge">
               <strong>שיא: {bestScore}</strong>
-              <span>הניקוד הטוב ביותר שלך</span>
+              <span>הניקוד הטוב ביותר שלך ברמת {difficulty}</span>
             </div>
           )}
         </div>
 
         <div className="card quiz-result-card">
-          <div className="result-emoji">{msg.emoji}</div>
+          {showConfetti && (
+            <div className="confetti-wrap">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="confetti-piece"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    background: ['#f5a623', '#8b6fd8', '#3f8fdb', '#22a3a3', '#2fa876'][i % 5],
+                    animationDelay: `${Math.random() * 0.6}s`,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          <div className="result-emoji">{badge.emoji}</div>
           <p className="result-score">
             {score} <span className="result-max">/ {maxScore}</span>
           </p>
-          <p className="result-msg">{msg.text}</p>
-          {isNewBest && <p className="result-record">🎉 שיא אישי חדש!</p>}
+          <p className="result-msg">{badge.text}</p>
+          {isNewBest && <p className="result-record">🎉 שיא אישי חדש ברמת {difficulty}!</p>}
+
+          <div className="badge-row">
+            <span className="badge-pill">{badge.emoji} {badge.text}</span>
+          </div>
+          <p className="quiz-saying">💬 {saying}</p>
         </div>
 
         <div className="card">
@@ -193,7 +277,7 @@ function Quiz() {
             {questions.map((q, i) => {
               const r = results[i];
               return (
-                <div key={q.id} className={`quiz-summary-item ${r?.correct ? 'correct' : 'wrong'}`}>
+                <div key={q.uid} className={`quiz-summary-item ${r?.correct ? 'correct' : 'wrong'}`}>
                   <span className="summary-icon">{r?.correct ? '✓' : '✗'}</span>
                   <div className="summary-body">
                     <p className="summary-q">{q.question}</p>
@@ -201,7 +285,6 @@ function Quiz() {
                       <p className="summary-ans">תשובה נכונה: {q.answer}</p>
                     )}
                   </div>
-                  <span className={`pill pill-difficulty pill-${q.difficulty}`}>{q.difficulty}</span>
                 </div>
               );
             })}
@@ -209,17 +292,19 @@ function Quiz() {
         </div>
 
         <div className="card quiz-footer-card">
-          <button className="primary" onClick={restart}>סבב חדש</button>
+          <button className="primary" onClick={restart}>סבב חדש ברמת {difficulty}</button>
+          <button className="secondary" onClick={chooseOtherLevel}>בחרו רמה אחרת</button>
         </div>
       </section>
     );
   }
 
+  // ─── מסך שאלה ───
   return (
     <section>
       <div className="card page-intro-card">
         <div>
-          <span className="pill">חידון</span>
+          <span className={`pill pill-difficulty pill-${difficulty}`}>{difficulty}</span>
           <h2>חידון פרשת {parasha.name}</h2>
           <p className="text-soft">שאלה {current + 1} מתוך {QUESTIONS_PER_ROUND}</p>
         </div>
