@@ -51,19 +51,17 @@ function Chumash() {
         </div>
       </div>
 
-      <div className="daily-grid">
-        <article className="card today-card">
-          <h3>עלייה יומית</h3>
-          <p className="text-soft">{chumash.description}</p>
-          {chumashRef ? (
-            <TextViewer sefariaRef={chumashRef} fallbackLabel="Sefaria.org" />
-          ) : (
-            <p className="text-viewer-status">⏳ טוען את פרשת השבוע...</p>
-          )}
-        </article>
+      <article className="card today-card">
+        <h3>עלייה יומית</h3>
+        <p className="text-soft">{chumash.description}</p>
+        {chumashRef ? (
+          <TextViewer sefariaRef={chumashRef} fallbackLabel="Sefaria.org" autoOpen />
+        ) : (
+          <p className="text-viewer-status">⏳ טוען את פרשת השבוע...</p>
+        )}
+      </article>
 
-        <ProgressWidget progress={progress} doneLabel="סמנתי כנלמד" />
-      </div>
+      <ProgressWidget progress={progress} doneLabel="סמנתי כנלמד" />
     </section>
   );
 }

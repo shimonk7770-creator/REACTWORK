@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const stripTags = (s) => s.replace(/<[^>]*>/g, '').trim();
 
@@ -28,33 +28,46 @@ function parseResponse(data) {
   }];
 }
 
-function TextViewer({ sefariaRef, fallbackLabel = 'Sefaria.org' }) {
-  const [open,     setOpen]     = useState(false);
+function TextViewer({ sefariaRef, fallbackLabel = 'Sefaria.org', autoOpen = false }) {
+  const [open,     setOpen]     = useState(autoOpen);
   const [sections, setSections] = useState(null);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState(false);
 
-  const toggle = async () => {
-    if (open) { setOpen(false); return; }
-    setOpen(true);
-    if (sections || error) return;
-    setLoading(true);
+  // כשה-ref משתנה (למשל נבחר יום אחר בלוח) — לאפס את התוכן הישן ולפתוח מחדש
+  useEffect(() => {
+    setSections(null);
     setError(false);
-    try {
-      const url =
-        `https://www.sefaria.org/api/texts/${encodeURIComponent(sefariaRef)}` +
-        `?lang=he&context=0&sheets=0`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('http');
-      const data = await res.json();
-      const parsed = parseResponse(data);
-      if (!parsed || !parsed.length) throw new Error('empty');
-      setSections(parsed);
-    } catch {
-      setError(true);
-    }
-    setLoading(false);
-  };
+    setOpen(autoOpen);
+  }, [sefariaRef, autoOpen]);
+
+  useEffect(() => {
+    if (!open || sections || error || loading) return;
+    let cancelled = false;
+
+    (async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const url =
+          `https://www.sefaria.org/api/texts/${encodeURIComponent(sefariaRef)}` +
+          `?lang=he&context=0&sheets=0`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('http');
+        const data = await res.json();
+        const parsed = parseResponse(data);
+        if (!parsed || !parsed.length) throw new Error('empty');
+        if (!cancelled) setSections(parsed);
+      } catch {
+        if (!cancelled) setError(true);
+      }
+      if (!cancelled) setLoading(false);
+    })();
+
+    return () => { cancelled = true; };
+  }, [open, sefariaRef]);
+
+  const toggle = () => setOpen((o) => !o);
 
   const fallbackUrl = `https://www.sefaria.org/${encodeURIComponent(sefariaRef)}?lang=he`;
 

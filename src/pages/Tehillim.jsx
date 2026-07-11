@@ -39,24 +39,22 @@ function Tehillim() {
         </div>
       </div>
 
-      <div className="daily-grid">
-        <article className="card today-card">
-          <h3>פרקי היום</h3>
-          {entries.map((entry) => (
-            <div key={entry.day} className="content-list" style={{ marginBottom: '10px' }}>
-              <span className="label">תהילים — פרקים {entry.tehillim}</span>
-              <TextViewer sefariaRef={entry.tehillimRef} fallbackLabel="Sefaria.org" />
-            </div>
-          ))}
-          {dayInfo.isCombinedDay && (
-            <p className="text-soft" style={{ fontSize: '0.85rem' }}>
-              חודש חסר — יומיים כ״ט ול׳ נלמדים יחד, כמנהג חב״ד.
-            </p>
-          )}
-        </article>
+      <article className="card today-card">
+        <h3>פרקי היום</h3>
+        {entries.map((entry) => (
+          <div key={entry.day} className="content-list" style={{ marginBottom: '10px' }}>
+            <span className="label">תהילים — פרקים {entry.tehillim}</span>
+            <TextViewer sefariaRef={entry.tehillimRef} fallbackLabel="Sefaria.org" autoOpen />
+          </div>
+        ))}
+        {dayInfo.isCombinedDay && (
+          <p className="text-soft" style={{ fontSize: '0.85rem' }}>
+            חודש חסר — יומיים כ״ט ול׳ נלמדים יחד, כמנהג חב״ד.
+          </p>
+        )}
+      </article>
 
-        <ProgressWidget progress={progress} doneLabel="סיימתי היום" />
-      </div>
+      <ProgressWidget progress={progress} doneLabel="סיימתי היום" />
 
       <div className="card notes-card">
         <h3>הסבר לימוד</h3>

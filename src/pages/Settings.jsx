@@ -135,6 +135,37 @@ function Settings() {
           </div>
         </div>
       </div>
+
+      <div className="card">
+        <h3>💌 מקווים שנהנתם!</h3>
+        <p>
+          תודה שאתם משתמשים באתר וממשיכים ללמוד יום־יום. כל פרק תהילים, כל עלייה בחומש
+          וכל קטע תניא — הם עוד לבנה בבניין. שיהיה בהצלחה, ושתזכו להמשיך ולהתחזק!
+        </p>
+        <div className="chitas-grid">
+          <div className="chitas-item">
+            <span className="label">📞 צרו קשר עם חב״ד</span>
+            <p>
+              מחפשים בית חב״ד קרוב אליכם, שיעור תורה, או עזרה בכל נושא?{' '}
+              <a href="https://www.chabad.org.il" target="_blank" rel="noreferrer" className="text-viewer-link">
+                חב״ד ישראל
+              </a>{' '}
+              ו-{' '}
+              <a href="https://www.chabad.org" target="_blank" rel="noreferrer" className="text-viewer-link">
+                Chabad.org
+              </a>{' '}
+              ישמחו לעזור בכל שאלה.
+            </p>
+          </div>
+          <div className="chitas-item">
+            <span className="label">🕯️ עשו עוד מצווה</span>
+            <p>
+              הדלקת נרות, הנחת תפילין, קביעת מזוזה, נתינת צדקה — כל מצווה קטנה מאירה עוד
+              יותר. כמו שאומרים: "מצווה גוררת מצווה".
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
