@@ -206,6 +206,25 @@ button, input, select { font: inherit; }
   flex-wrap: wrap;
 }
 
+/* Video card (home) */
+.video-card { padding: 24px; }
+.video-embed-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  margin-top: 16px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+.video-embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 /* Feature cards */
 .feature-card {
   min-height: 180px;
@@ -526,14 +545,21 @@ footer.app-footer {
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.035);
   cursor: default;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   min-height: 48px;
+  outline: none;
 }
+
+.hcal-cell.clickable { cursor: pointer; }
 
 .hcal-cell:hover:not(.empty) {
   background: rgba(255, 255, 255, 0.07);
   transform: scale(1.06);
 }
+
+.hcal-cell.clickable:hover { background: rgba(255, 189, 75, 0.14); }
+.hcal-cell.clickable:active { transform: scale(0.97); }
+.hcal-cell.clickable:focus-visible { box-shadow: 0 0 0 2px var(--gold); }
 
 .hcal-cell.empty   { background: transparent; }
 .hcal-cell.shabbat { background: rgba(255, 189, 75, 0.06); }
@@ -543,6 +569,10 @@ footer.app-footer {
   box-shadow: 0 0 14px rgba(110, 175, 94, 0.28);
 }
 .hcal-cell.done { background: rgba(110, 175, 94, 0.13); }
+.hcal-cell.selected {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 14px rgba(255, 189, 75, 0.4);
+}
 
 .hcal-greg { font-size: 1rem; font-weight: 600; color: #f0ece4; line-height: 1; }
 .hcal-heb  { font-size: 0.68rem; color: #888; margin-top: 2px; }
@@ -571,6 +601,7 @@ footer.app-footer {
   color: #777;
 }
 .legend-item { display: flex; align-items: center; gap: 5px; }
+.hcal-hint { color: var(--gold); font-weight: 600; }
 .leg-today  { width: 12px; height: 12px; border-radius: 4px; background: rgba(110,175,94,0.38); border: 1.5px solid var(--green); }
 .leg-done   { width: 12px; height: 12px; border-radius: 4px; background: rgba(110,175,94,0.18); }
 .leg-dot    { width: 8px;  height: 8px;  border-radius: 50%; background: var(--gold); }

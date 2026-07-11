@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HDate, HebrewCalendar, gematriya } from '@hebcal/core';
+import { HDate, HebrewCalendar, gematriya, Locale } from '@hebcal/core';
 
 const DOW_HE = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'שבת'];
 const MONTHS_HE = [
@@ -24,7 +24,7 @@ function getMonthEvents(year, month) {
   return map;
 }
 
-function HebrewCalendarGrid({ completedDays = new Set() }) {
+function HebrewCalendarGrid({ completedDays = new Set(), selectedDay = null, onSelectDay = null }) {
   const today = new Date();
   const [view, setView] = useState({ year: today.getFullYear(), month: today.getMonth() });
 
@@ -58,7 +58,9 @@ function HebrewCalendarGrid({ completedDays = new Set() }) {
         <div className="hcal-title">
           <span className="hcal-month-name">{MONTHS_HE[month]} {year}</span>
           <span className="hcal-month-he">
-            {new HDate(firstDay).getMonthName('he')} – {new HDate(lastDay).getMonthName('he')}
+            {Locale.gettext(new HDate(firstDay).getMonthName(), 'he')}
+            {' – '}
+            {Locale.gettext(new HDate(lastDay).getMonthName(), 'he')}
             {' '}
             {gematriya(new HDate(firstDay).getFullYear())}
           </span>
@@ -82,19 +84,27 @@ function HebrewCalendarGrid({ completedDays = new Set() }) {
           const isDone   = completedDays.has(hdate.getDate()) &&
                            date.getMonth() === today.getMonth() &&
                            date.getFullYear() === today.getFullYear();
-          const isSat    = date.getDay() === 6;
-          const key      = `${year}-${month}-${day}`;
-          const dayEvts  = events[key] || [];
+          const isSat      = date.getDay() === 6;
+          const key        = `${year}-${month}-${day}`;
+          const dayEvts    = events[key] || [];
+          const isSelected = selectedDay != null && hdate.getDate() === selectedDay;
+          const clickable  = typeof onSelectDay === 'function';
 
           return (
             <div
               key={day}
               className={[
                 'hcal-cell',
-                isToday  ? 'today'   : '',
-                isDone   ? 'done'    : '',
-                isSat    ? 'shabbat' : '',
+                isToday    ? 'today'    : '',
+                isDone     ? 'done'     : '',
+                isSat      ? 'shabbat'  : '',
+                isSelected ? 'selected' : '',
+                clickable  ? 'clickable' : '',
               ].join(' ').trim()}
+              onClick={clickable ? () => onSelectDay(hdate.getDate(), date) : undefined}
+              role={clickable ? 'button' : undefined}
+              tabIndex={clickable ? 0 : undefined}
+              onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') onSelectDay(hdate.getDate(), date); } : undefined}
             >
               <span className="hcal-greg">{day}</span>
               <span className="hcal-heb">{heDay}</span>
@@ -112,6 +122,9 @@ function HebrewCalendarGrid({ completedDays = new Set() }) {
         <span className="legend-item"><span className="leg-today" />היום</span>
         <span className="legend-item"><span className="leg-done" />הושלם</span>
         <span className="legend-item"><span className="leg-dot" />אירוע</span>
+        {typeof onSelectDay === 'function' && (
+          <span className="legend-item hcal-hint">👆 לחצו על יום לצפייה בתוכן שלו</span>
+        )}
       </div>
     </div>
   );

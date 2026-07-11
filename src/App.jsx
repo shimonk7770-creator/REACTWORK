@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, NavLink, Link } from 'react-router-dom';
 import Home from './pages/Home.jsx';
-import DailyBoard from './pages/DailyBoard.jsx';
+import Chumash from './pages/Chumash.jsx';
+import Tehillim from './pages/Tehillim.jsx';
+import Tanya from './pages/Tanya.jsx';
 import Quiz from './pages/Quiz.jsx';
 import Settings from './pages/Settings.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -33,8 +35,8 @@ function App() {
         <div className="reminder-banner">
           <span>הגיע זמן הלימוד שלך! כנס ללוח היומי וסמן את היום.</span>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <Link to="/daily" className="reminder-cta" onClick={() => setReminderVisible(false)}>
-              ללוח היומי
+            <Link to="/tehillim" className="reminder-cta" onClick={() => setReminderVisible(false)}>
+              ללימוד היומי
             </Link>
             <button className="reminder-close" onClick={() => setReminderVisible(false)}>
               ×
@@ -51,7 +53,9 @@ function App() {
 
         <nav className="app-nav">
           <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>בית</NavLink>
-          <NavLink to="/daily" className={({ isActive }) => (isActive ? 'active' : '')}>לוח יומי</NavLink>
+          <NavLink to="/chumash" className={({ isActive }) => (isActive ? 'active' : '')}>חומש</NavLink>
+          <NavLink to="/tehillim" className={({ isActive }) => (isActive ? 'active' : '')}>תהילים</NavLink>
+          <NavLink to="/tanya" className={({ isActive }) => (isActive ? 'active' : '')}>תניא</NavLink>
           <NavLink to="/quiz" className={({ isActive }) => (isActive ? 'active' : '')}>חידון פרשה</NavLink>
           <NavLink to="/settings" className={({ isActive }) => (isActive ? 'active' : '')}>הגדרות</NavLink>
         </nav>
@@ -60,7 +64,9 @@ function App() {
       <main className="app-content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/daily" element={<DailyBoard />} />
+          <Route path="/chumash" element={<Chumash />} />
+          <Route path="/tehillim" element={<Tehillim />} />
+          <Route path="/tanya" element={<Tanya />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />

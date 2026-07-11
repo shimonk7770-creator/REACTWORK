@@ -9,54 +9,64 @@ function Home() {
         <span className="pill">התחל היום</span>
         <h2>חת״ת יומי במראה חדש</h2>
         <p>
-          כל יום חומש, תהילים ותניא במקום אחד. צבור ניקוד על רצף, שאלון פרשה,
-          ותזכורות שיעזרו לך לא לוותר.
+          כל יום חומש, תהילים ותניא — כל אחד בעמוד מכובד משלו. צבור ניקוד על
+          רצף, שאלון פרשה, ותזכורות שיעזרו לך לא לוותר.
         </p>
         <div className="hero-actions">
-          <Link to="/daily" className="primary">פתח את לוח היומי</Link>
+          <Link to="/tehillim" className="primary">התחל ללמוד</Link>
           <Link to="/quiz" className="secondary">חידון פרשה</Link>
+        </div>
+      </div>
+
+      <div className="card video-card">
+        <span className="pill">🎬 סרטון היום</span>
+        <div className="video-embed-wrap">
+          <iframe
+            className="video-embed"
+            src="https://www.youtube.com/embed/ormF3yMohnI?autoplay=1&mute=1&rel=0"
+            title="סרטון חת״ת יומי"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
         </div>
       </div>
 
       <div className="features-grid">
         <article className="feature-card card">
-          <div className="feature-icon">📖</div>
-          <h3>לוח יום מעוצב</h3>
+          <div className="feature-icon">📜</div>
+          <h3>חומש</h3>
           <p>
-            חומש לפי יום בשבוע, תהילים לפי יום בחודש ותניא — הכל במקום אחד,
-            ברור ונוח.
+            העלייה היומית של פרשת השבוע עם פירוש רש״י, לפי היום בשבוע.
           </p>
-          <Link to="/daily" className="feature-link">לוח יומי ←</Link>
+          <Link to="/chumash" className="feature-link">לעמוד החומש ←</Link>
         </article>
 
         <article className="feature-card card">
-          <div className="feature-icon">🔥</div>
-          <h3>ניקוד ורצף</h3>
+          <div className="feature-icon">📗</div>
+          <h3>תהילים</h3>
           <p>
-            מסמן יום כהושלם — מקבל 10 נקודות. שמור רצף יומי וצפה בהתקדמות
-            שלך לאורך החודש.
+            פרקי היום מחולקים לפי היום העברי בחודש — מסונכרן ללוח העברי.
           </p>
-          <Link to="/daily" className="feature-link">לצבירת ניקוד ←</Link>
+          <Link to="/tehillim" className="feature-link">לעמוד התהילים ←</Link>
+        </article>
+
+        <article className="feature-card card">
+          <div className="feature-icon">📕</div>
+          <h3>תניא</h3>
+          <p>
+            שיעור התניא היומי, מסודר לפי היום העברי לאורך מחזור החודש.
+          </p>
+          <Link to="/tanya" className="feature-link">לעמוד התניא ←</Link>
         </article>
 
         <article className="feature-card card">
           <div className="feature-icon">🧠</div>
           <h3>חידון פרשה</h3>
           <p>
-            6 שאלות רנדומליות מ-20 שאלות על תורה. שלוש רמות קושי — קל, בינוני
-            וקשה עם ניקוד לפי רמה.
+            6 שאלות רנדומליות על תורה, שלוש רמות קושי — קל, בינוני וקשה.
           </p>
           <Link to="/quiz" className="feature-link">לחידון ←</Link>
-        </article>
-
-        <article className="feature-card card">
-          <div className="feature-icon">🔔</div>
-          <h3>תזכורות והגדרות</h3>
-          <p>
-            הגדר שעת לימוד קבועה וקבל תזכורת בתוך האפליקציה. עיין בסטטיסטיקה
-            האישית שלך.
-          </p>
-          <Link to="/settings" className="feature-link">להגדרות ←</Link>
         </article>
       </div>
     </section>
