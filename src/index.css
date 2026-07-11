@@ -807,6 +807,19 @@ footer.app-footer {
 .features-grid > :nth-child(2) { animation: fadeInUp 0.4s 0.12s  ease both; }
 .features-grid > :nth-child(3) { animation: fadeInUp 0.4s 0.19s  ease both; }
 .features-grid > :nth-child(4) { animation: fadeInUp 0.4s 0.26s  ease both; }
+.stats-grid > :nth-child(1) { animation: fadeInUp 0.4s 0.05s ease both; }
+.stats-grid > :nth-child(2) { animation: fadeInUp 0.4s 0.12s ease both; }
+
+/* Generic colored left-accent for content cards (settings page etc.) */
+.accent-card { border-right: 5px solid transparent; transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.accent-card.accent-purple { border-right-color: var(--purple); }
+.accent-card.accent-gold   { border-right-color: var(--gold); }
+.accent-card.accent-blue   { border-right-color: var(--blue); }
+.accent-card.accent-teal   { border-right-color: var(--teal); }
+
+.settings-hero { padding: 36px 40px; }
+.settings-hero .hero-title { font-size: clamp(1.7rem, 4vw, 2.3rem); }
+.settings-icon { font-size: 2.2rem; display: inline-block; animation: float 3s ease-in-out infinite; }
 .daily-grid > :nth-child(1)    { animation: fadeInUp 0.4s 0.06s  ease both; }
 .daily-grid > :nth-child(2)    { animation: fadeInUp 0.4s 0.15s  ease both; }
 .notes-card                    { animation: fadeInUp 0.4s 0.22s  ease both; }
@@ -1296,18 +1309,26 @@ input[type='time'] {
 }
 
 .quiz-quit-btn {
-  display: block;
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  font-size: 0.82rem;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--tint-2);
+  border: 1px solid var(--border-2);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
-  padding: 0 0 8px;
+  padding: 8px 16px;
+  margin-bottom: 14px;
   font-family: inherit;
-  transition: color 0.18s ease;
+  transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
 }
-.quiz-quit-btn:hover { color: var(--purple); }
+.quiz-quit-btn:hover {
+  color: var(--purple);
+  background: rgba(139, 111, 216, 0.14);
+  transform: translateX(3px);
+}
 
 /* ─── Difficulty selector ─── */
 .difficulty-grid {

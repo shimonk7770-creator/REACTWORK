@@ -6,6 +6,11 @@ function parseResponse(data) {
   const he = data.he;
   if (!he || !he.length) return null;
 
+  if (typeof he === 'string') {
+    // רפרנס לקטע יחיד (למשל פסקה בודדת בתניא) — מוחזר כמחרוזת, לא כמערך
+    return [{ chapterNum: null, verses: [he], startVerse: 1 }];
+  }
+
   if (Array.isArray(he[0])) {
     // multi-chapter: he = [[v1,v2,...], [v1,v2,...], ...]
     const startChap = Array.isArray(data.sections) ? data.sections[0] : 1;

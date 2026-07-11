@@ -37,17 +37,16 @@ function Settings() {
 
   return (
     <section>
-      <div className="card page-intro-card">
-        <div>
-          <span className="pill">הגדרות</span>
-          <h2>הגדרות ותזכורות</h2>
-          <p>נהל את שעת הלימוד שלך ועיין בסטטיסטיקה האישית.</p>
-        </div>
+      <div className="hero-card settings-hero card">
+        <span className="settings-icon">⚙️</span>
+        <span className="pill">הגדרות</span>
+        <h2 className="hero-title">נהלו את הלימוד שלכם</h2>
+        <p className="hero-subtitle">שעת תזכורת קבועה וסטטיסטיקה אישית — הכל במקום אחד.</p>
       </div>
 
       <div className="stats-grid">
-        <div className="card">
-          <h3>סטטיסטיקה אישית</h3>
+        <div className="card accent-card accent-purple">
+          <h3>📊 סטטיסטיקה אישית</h3>
           <div className="stat-row">
             <div className="progress-block">
               <span className="small-label">רצף לימוד</span>
@@ -80,8 +79,8 @@ function Settings() {
           </div>
         </div>
 
-        <div className="card">
-          <h3>תזכורת יומית</h3>
+        <div className="card accent-card accent-gold">
+          <h3>⏰ תזכורת יומית</h3>
           <p className="text-soft">
             הגדר שעה קבועה ללימוד. כאשר תפתח את האפליקציה בזמן הקרוב לשעה שהגדרת, תקבל
             תזכורת לתוך האפליקציה.
@@ -116,8 +115,8 @@ function Settings() {
         </div>
       </div>
 
-      <div className="card">
-        <h3>מהו חת״ת?</h3>
+      <div className="card accent-card accent-blue">
+        <h3>📖 מהו חת״ת?</h3>
         <p>
           <strong>ח</strong>ומש, <strong>ת</strong>הילים ו<strong>ת</strong>ניא — לימוד יומי
           שמקיף את כל חמשת חומשי תורה, ספר תהילים וספר התניא בכל שנה.
@@ -138,7 +137,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card accent-card accent-teal">
         <h3>💌 מקווים שנהנתם!</h3>
         <p>
           תודה שאתם משתמשים באתר וממשיכים ללמוד יום־יום. כל פרק תהילים, כל עלייה בחומש
