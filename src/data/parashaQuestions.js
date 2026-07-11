@@ -684,17 +684,36 @@ export const PARASHA_ALIASES = {
   'תזריע': 'שמיני',
   'מצורע': 'שמיני',
   'קדושים': 'אמור',
+  'אחרי מות': 'אחרי',
   'בהר': 'אמור',
   'בחוקותי': 'אמור',
   'מסעי': 'מטות',
+  'נצבים': 'ניצבים',
   'וילך': 'ניצבים',
   'וזאת הברכה': 'האזינו',
 };
 
-export function getQuestionsForParasha(parashaName) {
-  if (PARASHA_QUESTIONS[parashaName]) return PARASHA_QUESTIONS[parashaName];
-  const alias = PARASHA_ALIASES[parashaName];
+function resolveSingle(name) {
+  if (PARASHA_QUESTIONS[name]) return PARASHA_QUESTIONS[name];
+  const alias = PARASHA_ALIASES[name];
   if (alias && PARASHA_QUESTIONS[alias]) return PARASHA_QUESTIONS[alias];
+  return null;
+}
+
+// שמות פרשות כפולות (שבתות מחוברות) מגיעים כמחרוזת אחת עם מקף,
+// למשל "מטות–מסעי" — יש לפרק ולאחד את בנק השאלות של שתי הפרשות.
+export function getQuestionsForParasha(parashaName) {
+  const direct = resolveSingle(parashaName);
+  if (direct) return direct;
+
+  const parts = parashaName.split(/[–\-]/).map((p) => p.trim()).filter(Boolean);
+  if (parts.length > 1) {
+    const pools = parts.map(resolveSingle).filter(Boolean);
+    const uniquePools = [...new Set(pools)]; // אל תכפיל אם שני החלקים מצביעים לאותו בנק
+    const merged = uniquePools.flat();
+    if (merged.length) return merged;
+  }
+
   // fallback: חוקת
   return PARASHA_QUESTIONS['חוקת'];
 }

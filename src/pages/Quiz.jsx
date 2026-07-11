@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getQuestionsForParasha } from '../data/parashaQuestions.js';
 import { getCurrentParasha } from '../data/parashaData.js';
 
 const QUIZ_STORAGE_KEY = 'reactwork-quiz-best';
-const QUESTIONS_PER_ROUND = 6;
+const QUESTIONS_PER_ROUND = 10;
 
 const POINTS = { קל: 5, בינוני: 10, קשה: 15 };
 
@@ -22,10 +22,41 @@ function shuffle(arr) {
   return a;
 }
 
-function buildRound(parashaName) {
+function seenStorageKey(parashaName) {
+  return `reactwork-quiz-seen:${parashaName}`;
+}
+
+function loadSeen(parashaName) {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(seenStorageKey(parashaName)) || '[]'));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSeen(parashaName, seenSet) {
+  localStorage.setItem(seenStorageKey(parashaName), JSON.stringify([...seenSet]));
+}
+
+// בונה סבב חדש שמעדיף שאלות שעדיין לא נשאלו על פרשה זו. כשכל הבנק
+// נוצל — המחזור מתאפס וממשיכים משאלות "טריות" שוב.
+function buildRound(parashaName, seen) {
   const pool = getQuestionsForParasha(parashaName);
-  const indices = shuffle([...Array(pool.length).keys()]).slice(0, QUESTIONS_PER_ROUND);
-  return indices.map((origIdx) => {
+  const allIndices = shuffle([...Array(pool.length).keys()]);
+  const unseen = allIndices.filter((i) => !seen.has(i));
+
+  let chosenIndices;
+  let nextSeen;
+  if (unseen.length >= QUESTIONS_PER_ROUND) {
+    chosenIndices = unseen.slice(0, QUESTIONS_PER_ROUND);
+    nextSeen = new Set([...seen, ...chosenIndices]);
+  } else {
+    // לא נשארו מספיק שאלות טריות — מתחילים מחזור חדש
+    chosenIndices = allIndices.slice(0, Math.min(QUESTIONS_PER_ROUND, allIndices.length));
+    nextSeen = new Set(chosenIndices);
+  }
+
+  const questions = chosenIndices.map((origIdx) => {
     const item = pool[origIdx];
     const wrongPool = pool.filter((_, i) => i !== origIdx);
     const wrongAnswers = shuffle(wrongPool).slice(0, 3).map((w) => w.a);
@@ -37,6 +68,8 @@ function buildRound(parashaName) {
       difficulty: getDifficulty(origIdx),
     };
   });
+
+  return { questions, nextSeen };
 }
 
 function Quiz() {
@@ -44,7 +77,13 @@ function Quiz() {
 
   const parasha = getCurrentParasha();
 
-  const [questions, setQuestions] = useState(() => buildRound(parasha.name));
+  const seenRef = useRef(loadSeen(parasha.name));
+  const [questions, setQuestions] = useState(() => {
+    const { questions: qs, nextSeen } = buildRound(parasha.name, seenRef.current);
+    seenRef.current = nextSeen;
+    saveSeen(parasha.name, nextSeen);
+    return qs;
+  });
   const [current,   setCurrent]   = useState(0);
   const [selected,  setSelected]  = useState(null);
   const [revealed,  setRevealed]  = useState(false);
@@ -97,7 +136,10 @@ function Quiz() {
   };
 
   const restart = () => {
-    setQuestions(buildRound(parasha.name));
+    const { questions: qs, nextSeen } = buildRound(parasha.name, seenRef.current);
+    seenRef.current = nextSeen;
+    saveSeen(parasha.name, nextSeen);
+    setQuestions(qs);
     setCurrent(0);
     setSelected(null);
     setRevealed(false);
