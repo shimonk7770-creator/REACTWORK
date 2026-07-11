@@ -49,21 +49,31 @@
 ```
 REACTWORK/
 ├── index.html               # נקודת כניסה HTML + lang="he" dir="rtl"
-├── vite.config.js           # הגדרות Vite
+├── vite.config.js           # הגדרות Vite (server.port מכבד process.env.PORT)
 ├── package.json
 └── src/
     ├── main.jsx             # ReactDOM.render + BrowserRouter
     ├── App.jsx              # Shell: header, nav, routes, reminder banner
-    ├── index.css            # Global styles (RTL, dark theme, design system)
+    ├── index.css            # Global styles (RTL, ערכת נושא בהירה וצבעונית, design system)
     ├── pages/
-    │   ├── Home.jsx         # דף בית — hero card + כרטיסי תכונות
-    │   ├── DailyBoard.jsx   # לוח יומי — חומש/תהילים/תניא + streak + score
-    │   ├── Quiz.jsx         # חידון — שאלות רנדומליות + ניקוד לפי רמה
+    │   ├── Home.jsx         # דף בית — hero card + סרטון פתיחה + כרטיסי נושא
+    │   ├── Chumash.jsx      # עמוד חומש — לפי יום בשבוע + פרשת השבוע מ-Sefaria
+    │   ├── Tehillim.jsx     # עמוד תהילים — לפי יום עברי בחודש (HDate)
+    │   ├── Tanya.jsx        # עמוד תניא — לפי יום עברי בחודש (HDate)
+    │   ├── Quiz.jsx         # חידון — 10 שאלות לסבב + מעקב שאלות-שנשאלו
     │   └── Settings.jsx     # הגדרות — תזכורת יומית + סטטיסטיקה
+    ├── components/
+    │   ├── HebrewCalendarGrid.jsx  # לוח שנה עברי לחיץ (onSelectDay)
+    │   ├── ProgressWidget.jsx      # כרטיס רצף/ניקוד משותף לשלושת עמודי הלימוד
+    │   └── TextViewer.jsx          # טעינת טקסט מ-Sefaria API לפי דרישה
+    ├── hooks/
+    │   └── useDailyProgress.js     # יום נבחר (Date) + רצף/ניקוד/מיילסטונים
+    ├── utils/
+    │   └── hebrewDate.js           # getHebrewDayInfo() — יום עברי, חודש חסר (כ״ט/ל׳)
     └── data/
-        ├── dailyContent.js      # תוכן: chumashByDayOfWeek + dailyContent[30]
+        ├── dailyContent.js      # תוכן: chumashByDayOfWeek + dailyContent[30] (מפתח: יום עברי)
         ├── parashaData.js       # לוח פרשות ה׳תשפ״ו + getCurrentParasha()
-        └── parashaQuestions.js  # ~700 שאלות מ-abc770.org לכל פרשות השנה
+        └── parashaQuestions.js  # ~700 שאלות מ-abc770.org, כולל איחוד שבתות כפולות
 ```
 
 ### היררכיית קומפוננטים
@@ -71,35 +81,46 @@ REACTWORK/
 ```
 App (BrowserRouter)
 ├── ReminderBanner           # באנר תזכורת (מותנה)
-├── Header + Nav             # ניווט ראשי
+├── Header + Nav             # ניווט ראשי (בית / חומש / תהילים / תניא / חידון / הגדרות)
 ├── Routes
 │   ├── / → Home
-│   ├── /daily → DailyBoard
+│   ├── /chumash → Chumash
+│   ├── /tehillim → Tehillim
+│   ├── /tanya → Tanya
 │   ├── /quiz → Quiz
 │   └── /settings → Settings
 └── Footer
 ```
 
+כל אחד מ-Chumash/Tehillim/Tanya בנוי מ: `useDailyProgress()` (מצב משותף) +
+`HebrewCalendarGrid` (בחירת יום) + `ProgressWidget` (רצף/ניקוד) + `TextViewer` (תוכן מ-Sefaria).
+
 ### ניהול מצב (State Management)
 
 ```
 localStorage
-├── reactwork-daily-state    { selectedDay, completedDays[], streak, score, lastCompletedDate }
-├── reactwork-settings       { remindersOn, reminderTime }
-├── reactwork-quiz-best      number (שיא ניקוד)
-└── reactwork-reminder-seen  string (תאריך)
+├── reactwork-daily-state         { completedDays[], streak, score, lastCompletedDate }
+│                                   — completedDays מפתח לפי יום עברי בחודש (1–30), משותף לשלושת העמודים
+├── reactwork-settings            { remindersOn, reminderTime }
+├── reactwork-quiz-best           number (שיא ניקוד)
+├── reactwork-quiz-seen:<פרשה>    number[] (אינדקסים של שאלות שכבר נשאלו על פרשה זו)
+└── reactwork-reminder-seen       string (תאריך)
 ```
 
-**גישה:** כל עמוד מנהל את המצב שלו עם `useState` + `useEffect` לקריאה/כתיבה ב-`localStorage`.  
-אין state management גלובלי — המצב מחולק לוגית לפי דומיין (לוח יומי / חידון / הגדרות).
+**גישה:** `useDailyProgress()` הוא הוק משותף בין שלושת עמודי הלימוד — כך שסימון "נלמד"
+בכל אחד מהם משפיע על אותו רצף/ניקוד יחיד. חוץ מזה, כל עמוד מנהל את המצב שלו עם
+`useState` + `useEffect` לקריאה/כתיבה ב-`localStorage`. אין state management גלובלי.
 
 ### זרימת נתונים (Data Flow)
 
 ```
-dailyContent.js (static data)
+dailyContent.js (static, מפתח: יום עברי)          parashaQuestions.js (בנק שאלות)
+        ↓                                                    ↓
+hebrewDate.js: getHebrewDayInfo(selectedDate)        Quiz.jsx ←→ localStorage (bestScore, seen)
         ↓
-DailyBoard.jsx ←→ localStorage (streak, score, completedDays)
-Quiz.jsx       ←→ localStorage (bestScore)
+useDailyProgress() ←→ localStorage (streak, score, completedDays)
+        ↓
+Chumash.jsx / Tehillim.jsx / Tanya.jsx ←→ HebrewCalendarGrid (onSelectDay)
 Settings.jsx   ←→ localStorage (reminderTime, remindersOn)
 App.jsx        ←→ localStorage (reminder seen today)
 ```
@@ -112,19 +133,28 @@ App.jsx        ←→ localStorage (reminder seen today)
 חת"ת יומי
 │
 ├── / — דף הבית
-│       ├── Hero Card (CTA לפתיחת הלוח)
-│       └── כרטיסי תכונות (לוח יומי / ניקוד / חידון)
+│       ├── Hero Card (CTA ללימוד)
+│       ├── סרטון פתיחה מוטמע (YouTube, autoplay מושתק)
+│       └── כרטיסי נושא (חומש / תהילים / תניא / חידון)
 │
-├── /daily — לוח לימוד יומי
-│       ├── בחירת יום בחודש (1–30)
-│       ├── חומש (לפי יום בשבוע)
-│       ├── תהילים (לפי יום בחודש)
-│       ├── תניא (לפי יום בחודש)
-│       ├── כרטיס ניקוד ורצף
-│       └── הסבר לימוד
+├── /chumash — עמוד חומש
+│       ├── לוח שנה עברי לחיץ
+│       ├── עלייה יומית לפי יום בשבוע + פרשת השבוע (Sefaria)
+│       └── כרטיס ניקוד ורצף (משותף)
+│
+├── /tehillim — עמוד תהילים
+│       ├── לוח שנה עברי לחיץ
+│       ├── פרקי היום לפי יום עברי בחודש (כולל יום כ״ט/ל׳ מאוחד בחודש חסר)
+│       └── כרטיס ניקוד ורצף (משותף)
+│
+├── /tanya — עמוד תניא
+│       ├── לוח שנה עברי לחיץ
+│       ├── שיעור היום לפי יום עברי בחודש
+│       └── כרטיס ניקוד ורצף (משותף)
 │
 ├── /quiz — חידון פרשת השבוע
-│       ├── 6 שאלות רנדומליות מתוך בנק שאלות
+│       ├── 10 שאלות מתוך בנק שאלות הפרשה הנוכחית (כולל שבתות כפולות)
+│       ├── מעקב שאלות-שנשאלו — סבב הבא מעדיף שאלות טריות
 │       ├── 3 רמות קושי (קל / בינוני / קשה)
 │       ├── ניקוד לפי רמה (5 / 10 / 15 נקודות)
 │       ├── משוב מיידי
@@ -140,10 +170,12 @@ App.jsx        ←→ localStorage (reminder seen today)
 
 ## שימוש מרכזי
 
-1. ✅ חוויית "לוח היום":
-   - ✅ כל יום בחודש מציג חומש, תהילים ותניא
-   - ✅ תוכן אמיתי — תהילים לפי יום בחודש, חומש לפי יום בשבוע, תניא במחזור חודשי
-   - ✅ ניתן לשנות יום בחודש ולצפות בתוכן המתאים
+1. ✅ שלושה עמודי לימוד ייעודיים (חומש / תהילים / תניא):
+   - ✅ כל נושא מקבל עמוד, עיצוב וצבע משלו (במקום כרטיס אחד דחוס)
+   - ✅ תוכן אמיתי — תהילים ותניא לפי **יום עברי** בחודש (`HDate`, לא לועזי), חומש לפי יום בשבוע
+   - ✅ יום כ״ט/ל׳ מוצג מאוחד בחודשים עבריים חסרים (29 יום), כמנהג חב״ד
+   - ✅ לוח שנה עברי לחיץ בכל עמוד — לחיצה על יום מציגה מיד את התוכן שלו
+   - ✅ כרטיס רצף/ניקוד משותף לשלושת העמודים (סימון "נלמד" בכל אחד מהם תורם לאותו רצף)
 
 2. ✅ מערכת רצף וניקוד:
    - ✅ המשתמש מסמן יום כמושלם
@@ -157,13 +189,15 @@ App.jsx        ←→ localStorage (reminder seen today)
    - ✅ התראות בתוך האפליקציה בעת כניסה
 
 4. ✅ חידון פרשת השבוע:
-   - ✅ שאלות אמיתיות מ-abc770.org לפרשת השבוע הנוכחית
-   - ✅ שאלה אחת בכל פעם עם 4 אפשרויות (1 נכונה + 3 מפרשה)
+   - ✅ שאלות אמיתיות מ-abc770.org לפרשת השבוע הנוכחית — **כולל שבתות כפולות** (מטות–מסעי וכו׳), שמאחדות את בנק השאלות של שתי הפרשות
+   - ✅ 10 שאלות בכל סבב, שאלה אחת בכל פעם עם 4 אפשרויות (1 נכונה + 3 מפרשה)
+   - ✅ מעקב שאלות-שנשאלו per-פרשה — סבב חדש מעדיף שאלות טריות, מתאפס רק כשכל הבנק נוצל
    - ✅ ניקוד לפי רמת קושי: קל (5) / בינוני (10) / קשה (15)
    - ✅ פידבק מיידי עם צבעים ואנימציה
    - ✅ פס התקדמות בחידון
    - ✅ מסך תוצאות עם סיכום כל השאלות
-   - ✅ בנק שאלות רנדומלי + שיא אישי
+   - ✅ שיא אישי
+   - 🔲 תגי הישג, אמירות עידוד ואנימציית קונפטי (מתוכנן)
 
 5. ✅ בונוס רצף (מיילסטונים):
    - ✅ 7 ימים ברצף = +50 נקודות בונוס 🎉
@@ -190,7 +224,16 @@ App.jsx        ←→ localStorage (reminder seen today)
 6. ✅ פרשת השבוע אוטומטית:
    - ✅ לוח פרשות מלא לשנת ה'תשפ"ו (45 שבתות)
    - ✅ חישוב אוטומטי לפי תאריך השבת הקרוב
-   - ✅ הצגה בלוח היומי: שם פרשה + ספר + יום בשבוע
+   - ✅ הצגה בעמוד החומש: שם פרשה + ספר + יום בשבוע
+
+9. ✅ סרטון פתיחה:
+   - ✅ סרטון YouTube מוטמע בדף הבית, מופעל אוטומטית ומושתק (מגבלת דפדפנים ל-autoplay עם קול)
+
+10. ✅ עיצוב בהיר וצבעוני:
+   - ✅ ערכת נושא בהירה עם glassmorphism (במקום dark theme)
+   - ✅ פלטת צבעים מרובה: זהב / סגול / כחול / טורקיז / ירוק
+   - ✅ כל עמוד נושא (חומש/תהילים/תניא) מקבל פס צבע ייחודי
+   - ✅ אנימציות נוספות: brandShift, pillPulse, popIn, confettiFall (מוכן לתגי הישג)
 
 ---
 
@@ -252,4 +295,6 @@ App.jsx        ←→ localStorage (reminder seen today)
 ## מקורות ונתונים
 
 - מקור ראשוני לחלוקה: chabad.org.il — חלוקת תהילים וחת"ת יומי
+- בנק שאלות החידון: abc770.org (~700 שאלות, 35 פרשות)
 - בשלב הראשון נתונים סטטיים/מובנים באפליקציה
+- נבדק כמקור אפשרי להרחבת בנק השאלות: shayleyeladim.org.il — נמצא שהעמוד שסופק הוא עמוד ניווט בלבד (קישורים לפרשות ספר בראשית) ואינו מכיל שאלות בפועל; הרחבת התוכן טרם בוצעה
