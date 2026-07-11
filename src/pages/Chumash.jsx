@@ -90,6 +90,15 @@ function Chumash() {
       </article>
 
       <ProgressWidget progress={progress} doneLabel="סמנתי כנלמד" />
+
+      <div className="card notes-card">
+        <h3>הסבר לימוד — פרשת {parasha.name}</h3>
+        {calendarItem?.description?.he ? (
+          <p>{calendarItem.description.he}</p>
+        ) : (
+          <p className="text-soft">⏳ טוען הסבר על הפרשה...</p>
+        )}
+      </div>
     </section>
   );
 }

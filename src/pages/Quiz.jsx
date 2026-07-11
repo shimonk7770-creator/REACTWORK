@@ -69,30 +69,28 @@ function saveSeen(parashaName, difficulty, seenSet) {
   localStorage.setItem(seenStorageKey(parashaName, difficulty), JSON.stringify([...seenSet]));
 }
 
-// בונה סבב של 10 שאלות מתוך רמת הקושי הנבחרת בלבד, מעדיף שאלות טריות.
-// אם לרמה יש פחות מ-10 שאלות בבנק — ממלאים עד 10 בחזרות (מעורבבות),
-// כדי שהחוויה תמיד תהיה 10 שאלות מלאות.
+// בונה סבב של עד 10 שאלות, תמיד ייחודיות (בלי כפילות בתוך אותו סבב).
+// כל בנק פרשה מתחלק ל-3 שלישים (~5–7 שאלות כל אחד), כך שרמת קושי
+// בודדת כמעט אף פעם לא מכילה 10 שאלות ייחודיות משלה — לכן בונים
+// סדר עדיפות: טריות ברמה הנבחרת ← נצפו ברמה הנבחרת ← טריות ברמות
+// אחרות ← נצפו ברמות אחרות, וחותכים ל-10. שאלות "מושאלות" מרמה אחרת
+// עדיין מתויגות ומנוקדות לפי הרמה שנבחרה (לא לפי מקור השאלה בפועל).
 function buildRound(parashaName, difficulty, seen) {
   const pool = getQuestionsForParasha(parashaName);
-  const tierIndices = pool.map((_, i) => i).filter((i) => tierForIndex(i, pool.length) === difficulty);
-  const shuffledTier = shuffle(tierIndices);
-  const unseen = shuffledTier.filter((i) => !seen.has(i));
+  const allIndices = pool.map((_, i) => i);
+  const inTier = (i) => tierForIndex(i, pool.length) === difficulty;
 
-  let chosenIndices;
-  let nextSeen;
-  if (unseen.length >= QUESTIONS_PER_ROUND) {
-    chosenIndices = unseen.slice(0, QUESTIONS_PER_ROUND);
-    nextSeen = new Set([...seen, ...chosenIndices]);
-  } else if (tierIndices.length >= QUESTIONS_PER_ROUND) {
-    chosenIndices = shuffledTier.slice(0, QUESTIONS_PER_ROUND);
-    nextSeen = new Set(chosenIndices);
-  } else {
-    // הרמה עצמה מכילה פחות מ-10 שאלות ייחודיות — ממלאים עם חזרות
-    const filled = [];
-    while (filled.length < QUESTIONS_PER_ROUND) filled.push(...shuffle(tierIndices));
-    chosenIndices = filled.slice(0, QUESTIONS_PER_ROUND);
-    nextSeen = new Set(tierIndices);
-  }
+  const priorityOrder = [
+    ...shuffle(allIndices.filter((i) => inTier(i) && !seen.has(i))),
+    ...shuffle(allIndices.filter((i) => inTier(i) && seen.has(i))),
+    ...shuffle(allIndices.filter((i) => !inTier(i) && !seen.has(i))),
+    ...shuffle(allIndices.filter((i) => !inTier(i) && seen.has(i))),
+  ];
+
+  const chosenIndices = priorityOrder.slice(0, Math.min(QUESTIONS_PER_ROUND, pool.length));
+
+  let nextSeen = new Set([...seen, ...chosenIndices]);
+  if (nextSeen.size >= pool.length) nextSeen = new Set(); // מיצינו את כל הבנק — מחזור חדש בפעם הבאה
 
   const questions = chosenIndices.map((origIdx, pos) => {
     const item = pool[origIdx];
@@ -187,6 +185,11 @@ function Quiz() {
 
   const restart = () => startQuiz(difficulty);
   const chooseOtherLevel = () => setDifficulty(null);
+  const quitQuiz = () => {
+    if (results.length === 0 || window.confirm('לצאת מהחידון הנוכחי? ההתקדמות בסבב הזה תאבד.')) {
+      setDifficulty(null);
+    }
+  };
 
   const maxScore = questions.length * POINTS[difficulty];
   const progress = results.length / QUESTIONS_PER_ROUND;
@@ -304,6 +307,7 @@ function Quiz() {
     <section>
       <div className="card page-intro-card">
         <div>
+          <button className="quiz-quit-btn" onClick={quitQuiz}>‹ חזרה לבחירת רמה</button>
           <span className={`pill pill-difficulty pill-${difficulty}`}>{difficulty}</span>
           <h2>חידון פרשת {parasha.name}</h2>
           <p className="text-soft">שאלה {current + 1} מתוך {QUESTIONS_PER_ROUND}</p>

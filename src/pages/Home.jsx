@@ -17,18 +17,23 @@ function Home() {
 
   return (
     <section>
-      <div className="hero-card card">
-        <span className="pill">✨ התחל היום</span>
-        <h2 className="hero-title">חת״ת יומי במראה חדש</h2>
-        <p>
-          כל יום חומש, תהילים ותניא — כל אחד בעמוד מכובד משלו. צבור ניקוד על
-          רצף, שאלון פרשה, ותזכורות שיעזרו לך לא לוותר.
+      <div className="hero-card hero-card-big card">
+        <span className="hero-wave">👋</span>
+        <span className="pill">ברוך הבא</span>
+        <h1 className="hero-title">בוא נלמד היום</h1>
+        <p className="hero-subtitle">
+          חת״ת יומי — חומש, תהילים ותניא בעיצוב חדש ומכובד, עם ניקוד רצף,
+          חידון פרשה ותזכורות שיעזרו לך לא לוותר.
+        </p>
+        <p className="hero-rebbe-note">
+          💡 על פי הוראת הרבי, נהוג ללמוד <strong>חת״ת</strong> — חומש, תהילים ותניא — בכל יום.
+          כאן תמצאו את שלושתם במקום אחד, מסונכרנים ליום העברי.
         </p>
         <div className="hero-actions">
           <Link to="/chumash" className="subject-btn chumash">📜 התחל ללמוד חומש</Link>
           <Link to="/tehillim" className="subject-btn tehillim">📗 התחל ללמוד תהילים</Link>
           <Link to="/tanya" className="subject-btn tanya">📕 התחל ללמוד תניא</Link>
-          <Link to="/quiz" className="secondary">חידון פרשה</Link>
+          <Link to="/quiz" className="subject-btn quiz">🧠 חידון פרשה</Link>
         </div>
       </div>
 
