@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getHebrewDayInfo } from '../utils/hebrewDate.js';
+import { getHebrewDayInfo, toLocalDateStr } from '../utils/hebrewDate.js';
 
 const STORAGE_KEY = 'reactwork-daily-state';
 
@@ -34,6 +34,10 @@ export function useDailyProgress() {
   const [streak,            setStreak]            = useState(() => loadStoredState().streak || 0);
   const [score,             setScore]             = useState(() => loadStoredState().score || 0);
   const [lastCompletedDate, setLastCompletedDate] = useState(() => loadStoredState().lastCompletedDate ?? null);
+  // היסטוריה מלאה של תאריכים (ISO) שסומנו כהושלמו — לא מתאפסת מדי חודש,
+  // בשונה מ-completedDays שמייצג רק את התקדמות החודש הנוכחי. משמשת למפת
+  // הרצף השנתית.
+  const [history,           setHistory]           = useState(() => loadStoredState().history || []);
   const [milestoneAlert,    setMilestoneAlert]    = useState(null);
   const [justCompleted,     setJustCompleted]     = useState(false);
   const [scoreAnim,         setScoreAnim]         = useState(false);
@@ -48,11 +52,11 @@ export function useDailyProgress() {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
-        completedDays: [...completedDays], streak, score, lastCompletedDate,
+        completedDays: [...completedDays], streak, score, lastCompletedDate, history,
         selectedDateISO: selectedDate.toISOString(),
       })
     );
-  }, [completedDays, streak, score, lastCompletedDate, selectedDate]);
+  }, [completedDays, streak, score, lastCompletedDate, history, selectedDate]);
 
   const completed = completedDays.has(dayInfo.day);
   const nextMilestone = MILESTONES.find((m) => m.days > streak);
@@ -69,6 +73,9 @@ export function useDailyProgress() {
     const newSet = new Set(completedDays);
     newSet.add(dayInfo.day);
     setCompletedDays(newSet);
+
+    const dateStr = toLocalDateStr(selectedDate);
+    if (!history.includes(dateStr)) setHistory((prev) => [...prev, dateStr]);
 
     const newStreak = lastCompletedDate === yesterdayStr ? streak + 1 : 1;
     setStreak(newStreak);
@@ -96,13 +103,14 @@ export function useDailyProgress() {
     setScore(0);
     setLastCompletedDate(null);
     setMilestoneAlert(null);
+    setHistory([]);
   };
 
   return {
     todayInfo,
     selectedDate, selectDate, isToday,
     dayInfo, dayOfWeek,
-    completedDays, completed,
+    completedDays, completed, history,
     streak, streakEmoji, streakAnim,
     score, scoreAnim,
     justCompleted,

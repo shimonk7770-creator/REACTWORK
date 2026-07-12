@@ -3,6 +3,7 @@ import { Location } from '@hebcal/core';
 import { applyFontSize } from '../utils/fontSize.js';
 import { applyTheme, loadTheme } from '../utils/theme.js';
 import { loadCityName, saveCityName } from '../utils/shabbatTimes.js';
+import YearHeatmap from '../components/YearHeatmap.jsx';
 
 const SETTINGS_KEY = 'reactwork-settings';
 const DAILY_KEY = 'reactwork-daily-state';
@@ -26,6 +27,7 @@ function Settings() {
   const [cityInput, setCityInput] = useState('Jerusalem');
   const [cityError, setCityError] = useState(false);
   const [stats, setStats] = useState({ streak: 0, score: 0, completedDays: 0, quizBest: 0 });
+  const [history, setHistory] = useState([]);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -46,6 +48,7 @@ function Settings() {
       completedDays: (d.completedDays || []).length,
       quizBest,
     });
+    setHistory(d.history || []);
   }, []);
 
   const saveSettings = () => {
@@ -158,6 +161,12 @@ function Settings() {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="card accent-card accent-purple">
+        <h3>🗓️ מפת רצף שנתית</h3>
+        <p className="text-soft">כל ריבוע הוא יום — ככל שירוק יותר, כך למדתם באותו יום.</p>
+        <YearHeatmap history={history} />
       </div>
 
       <div className="card accent-card accent-teal">

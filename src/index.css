@@ -530,6 +530,48 @@ button, input, select { font: inherit; }
 .control-row-compact { margin-top: 0; flex-wrap: nowrap; }
 .share-btn:hover { background: rgba(47, 168, 118, 0.16); border-color: rgba(47, 168, 118, 0.35); color: #1a6b48; }
 
+/* ─── Year heatmap (מפת רצף שנתית) ─── */
+.heatmap-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.heatmap-dow-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+  padding-top: 0;
+}
+.heatmap-dow {
+  height: 11px;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  line-height: 11px;
+}
+.heatmap-grid {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 3px;
+}
+.heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.heatmap-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--tint-2);
+}
+.heatmap-cell.empty { background: transparent; }
+.heatmap-cell.done {
+  background: linear-gradient(135deg, var(--green), var(--teal));
+  box-shadow: 0 0 4px rgba(47, 168, 118, 0.4);
+}
+
 /* ─── Content list ─── */
 .content-list {
   display: grid;
