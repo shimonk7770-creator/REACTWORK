@@ -7,6 +7,7 @@ import Tanya from './pages/Tanya.jsx';
 import Quiz from './pages/Quiz.jsx';
 import Settings from './pages/Settings.jsx';
 import NotFound from './pages/NotFound.jsx';
+import { applyFontSize, loadFontSize } from './utils/fontSize.js';
 
 function App() {
   const [reminderVisible, setReminderVisible] = useState(false);
@@ -14,6 +15,8 @@ function App() {
   const location = useLocation();
 
   useEffect(() => { setNavOpen(false); }, [location.pathname]);
+
+  useEffect(() => { applyFontSize(loadFontSize()); }, []);
 
   useEffect(() => {
     const settings = JSON.parse(localStorage.getItem('reactwork-settings') || '{}');

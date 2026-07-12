@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react';
+import { applyFontSize } from '../utils/fontSize.js';
 
 const SETTINGS_KEY = 'reactwork-settings';
 const DAILY_KEY = 'reactwork-daily-state';
 const QUIZ_DIFFICULTIES = ['קל', 'בינוני', 'קשה'];
+const FONT_SIZES = [
+  { value: 'normal', label: 'רגיל' },
+  { value: 'large',  label: 'גדול' },
+  { value: 'xlarge', label: 'גדול מאוד' },
+];
 
 function Settings() {
   useEffect(() => { document.title = 'הגדרות | חת"ת יומי'; }, []);
   const [remindersOn, setRemindersOn] = useState(false);
   const [reminderTime, setReminderTime] = useState('08:00');
+  const [fontSize, setFontSize] = useState('normal');
   const [stats, setStats] = useState({ streak: 0, score: 0, completedDays: 0, quizBest: 0 });
   const [saved, setSaved] = useState(false);
 
@@ -15,6 +22,7 @@ function Settings() {
     const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
     if (s.remindersOn !== undefined) setRemindersOn(s.remindersOn);
     if (s.reminderTime) setReminderTime(s.reminderTime);
+    if (s.fontSize) setFontSize(s.fontSize);
 
     const d = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
     const quizBest = QUIZ_DIFFICULTIES.reduce((sum, level) => {
@@ -29,10 +37,18 @@ function Settings() {
   }, []);
 
   const saveSettings = () => {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ remindersOn, reminderTime }));
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...s, remindersOn, reminderTime }));
     localStorage.removeItem('reactwork-reminder-seen');
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const changeFontSize = (size) => {
+    setFontSize(size);
+    applyFontSize(size);
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...s, fontSize: size }));
   };
 
   return (
@@ -112,6 +128,23 @@ function Settings() {
               {saved ? 'נשמר בהצלחה!' : 'שמור הגדרות'}
             </button>
           </div>
+        </div>
+      </div>
+
+      <div className="card accent-card accent-red">
+        <h3>♿ התאמה אישית</h3>
+        <p className="text-soft">התאימו את התצוגה לצרכים שלכם.</p>
+        <span className="small-label" style={{ marginTop: '14px', display: 'block' }}>גודל גופן</span>
+        <div className="option-pill-row">
+          {FONT_SIZES.map((f) => (
+            <button
+              key={f.value}
+              className={`option-pill${fontSize === f.value ? ' active' : ''}`}
+              onClick={() => changeFontSize(f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       </div>
 

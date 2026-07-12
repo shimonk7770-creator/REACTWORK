@@ -36,7 +36,12 @@
   background: var(--bg-0);
   color: var(--text);
   line-height: 1.6;
+  font-size: 16px;
 }
+
+/* נגישות — הגדלת גופן (נשלט מעמוד ההגדרות) */
+:root[data-font-size='large']  { font-size: 18px; }
+:root[data-font-size='xlarge'] { font-size: 20px; }
 
 * { box-sizing: border-box; }
 
@@ -843,6 +848,27 @@ footer.app-footer {
 .accent-card.accent-gold   { border-right-color: var(--gold); }
 .accent-card.accent-blue   { border-right-color: var(--blue); }
 .accent-card.accent-teal   { border-right-color: var(--teal); }
+.accent-card.accent-red    { border-right-color: var(--red); }
+
+.option-pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.option-pill {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-2);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-soft);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.option-pill.active {
+  background: linear-gradient(135deg, rgba(245, 166, 35, 0.22), rgba(139, 111, 216, 0.18));
+  border-color: rgba(245, 166, 35, 0.4);
+  color: var(--gold-soft);
+}
+.option-pill:hover:not(.active) { background: var(--tint-2); }
 
 .settings-hero { padding: 36px 40px; }
 .settings-hero .hero-title { font-size: clamp(1.7rem, 4vw, 2.3rem); }
