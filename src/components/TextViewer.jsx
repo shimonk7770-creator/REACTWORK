@@ -39,20 +39,23 @@ function TextViewer({ sefariaRef, fallbackLabel = 'Sefaria.org', autoOpen = fals
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState(false);
 
-  // כשה-ref משתנה (למשל נבחר יום אחר בלוח) — לאפס את התוכן הישן ולפתוח מחדש
+  // כשה-ref משתנה (למשל נבחר יום אחר בלוח) — לפתוח מחדש אם autoOpen
   useEffect(() => {
-    setSections(null);
-    setError(false);
     setOpen(autoOpen);
   }, [sefariaRef, autoOpen]);
 
+  // טוען טקסט בכל פעם שהפאנל פתוח וה-ref משתנה. האיפוס (sections/error)
+  // וה-fetch נמצאים באותו effect בכוונה — לא תלויים ב-sections/error/loading
+  // כתנאי-שער, כי אלה נקראים מה-closure של הרינדור הנוכחי ועלולים להיות
+  // "ישנים" אם effect אחר איפס אותם באותו commit בלי שהם ברשימת התלויות כאן.
   useEffect(() => {
-    if (!open || sections || error || loading) return;
+    if (!open) return;
     let cancelled = false;
+    setSections(null);
+    setError(false);
 
     (async () => {
       setLoading(true);
-      setError(false);
       try {
         const url =
           `https://www.sefaria.org/api/texts/${encodeURIComponent(sefariaRef)}` +
