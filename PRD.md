@@ -89,29 +89,38 @@ REACTWORK/
 ├── index.html               # נקודת כניסה HTML + lang="he" dir="rtl"
 ├── vite.config.js           # הגדרות Vite (server.port מכבד process.env.PORT)
 ├── package.json
+├── public/
+│   ├── manifest.json        # PWA manifest (שם, אייקון, start_url, theme_color)
+│   ├── icon.svg              # אייקון האפליקציה (SVG — בלי צורך ב-PNG ראסטר)
+│   └── sw.js                  # Service Worker — network-first, נרשם רק ב-production
 └── src/
-    ├── main.jsx             # ReactDOM.render + BrowserRouter
-    ├── App.jsx              # Shell: header, nav, routes, reminder banner
-    ├── index.css            # Global styles (RTL, ערכת נושא בהירה וצבעונית, design system)
+    ├── main.jsx             # ReactDOM.render + BrowserRouter + רישום SW (production בלבד)
+    ├── App.jsx              # Shell: header, תפריט המבורגר במובייל, routes, reminder banner
+    ├── index.css            # Global styles (RTL, בהיר/כהה, רספונסיבי, design system)
     ├── pages/
-    │   ├── Home.jsx         # דף בית — hero card + סרטון פתיחה + כרטיסי נושא
-    │   ├── Chumash.jsx      # עמוד חומש — לפי יום בשבוע + פרשת השבוע מ-Sefaria
+    │   ├── Home.jsx         # דף בית — hero card + סרטון פתיחה + מחשבה יומית + זמני שבת
+    │   ├── Chumash.jsx      # עמוד חומש — לפי יום בשבוע + עלייה מדויקת מ-Sefaria
     │   ├── Tehillim.jsx     # עמוד תהילים — לפי יום עברי בחודש (HDate)
-    │   ├── Tanya.jsx        # עמוד תניא — לפי יום עברי בחודש (HDate)
-    │   ├── Quiz.jsx         # חידון — 10 שאלות לסבב + מעקב שאלות-שנשאלו
-    │   └── Settings.jsx     # הגדרות — תזכורת יומית + סטטיסטיקה
+    │   ├── Tanya.jsx        # עמוד תניא — Sefaria "Tanya Yomi" חי להיום, מיפוי מקומי ליום אחר
+    │   ├── Quiz.jsx         # חידון — רמות קושי, 10 שאלות ייחודיות לסבב, מעקב שאלות-שנשאלו
+    │   └── Settings.jsx     # הגדרות — תזכורות, עיר, נגישות, מצב לילה, מפת רצף שנתית
     ├── components/
-    │   ├── HebrewCalendarGrid.jsx  # לוח שנה עברי לחיץ (onSelectDay)
-    │   ├── ProgressWidget.jsx      # כרטיס רצף/ניקוד משותף לשלושת עמודי הלימוד
-    │   └── TextViewer.jsx          # טעינת טקסט מ-Sefaria API לפי דרישה
+    │   ├── HebrewCalendarGrid.jsx  # לוח שנה עברי לחיץ (onSelectDay), שם פרשה על תא שבת
+    │   ├── ProgressWidget.jsx      # כרטיס רצף/ניקוד + שיתוף, משותף לשלושת עמודי הלימוד
+    │   ├── TextViewer.jsx          # טעינת טקסט מ-Sefaria API לפי דרישה
+    │   └── YearHeatmap.jsx         # מפת רצף שנתית בסגנון GitHub contributions
     ├── hooks/
-    │   └── useDailyProgress.js     # יום נבחר (Date) + רצף/ניקוד/מיילסטונים
+    │   └── useDailyProgress.js     # יום נבחר (Date) + רצף/ניקוד/היסטוריה/מיילסטונים
     ├── utils/
-    │   └── hebrewDate.js           # getHebrewDayInfo() — יום עברי, חודש חסר (כ״ט/ל׳)
+    │   ├── hebrewDate.js           # getHebrewDayInfo(), toLocalDateStr() — חודש חסר (כ״ט/ל׳)
+    │   ├── fontSize.js              # שמירה/החלה של הגדלת גופן נגישה
+    │   ├── theme.js                  # שמירה/החלה של מצב לילה
+    │   └── shabbatTimes.js           # חישוב זמני כניסת/יציאת שבת לפי עיר (@hebcal/core)
     └── data/
         ├── dailyContent.js      # תוכן: chumashByDayOfWeek + dailyContent[30] (מפתח: יום עברי)
         ├── parashaData.js       # לוח פרשות ה׳תשפ״ו + getCurrentParasha()
-        └── parashaQuestions.js  # ~700 שאלות מ-abc770.org, כולל איחוד שבתות כפולות
+        ├── parashaQuestions.js  # ~700 שאלות מ-abc770.org, כולל איחוד שבתות כפולות
+        └── dailyThoughts.js      # 12 מחשבות יומיות מתחלפות לדף הבית
 ```
 
 ### היררכיית קומפוננטים
@@ -137,17 +146,31 @@ App (BrowserRouter)
 
 ```
 localStorage
-├── reactwork-daily-state         { completedDays[], streak, score, lastCompletedDate }
-│                                   — completedDays מפתח לפי יום עברי בחודש (1–30), משותף לשלושת העמודים
-├── reactwork-settings            { remindersOn, reminderTime }
-├── reactwork-quiz-best           number (שיא ניקוד)
-├── reactwork-quiz-seen:<פרשה>    number[] (אינדקסים של שאלות שכבר נשאלו על פרשה זו)
-└── reactwork-reminder-seen       string (תאריך)
+├── reactwork-daily-state              { completedDays[], streak, score, lastCompletedDate,
+│                                         history[], selectedDateISO }
+│                                        — completedDays מפתח לפי יום עברי בחודש (1–30), משותף לשלושת העמודים
+│                                        — history: כל תאריכי ה-ISO (מקומיים) שסומנו אי-פעם, לא מתאפס
+│                                          מדי חודש (בשונה מ-completedDays) — מוצג במפת הרצף השנתית
+├── reactwork-settings                 { remindersOn, reminderTime, fontSize, theme }
+├── reactwork-city                     string (שם עיר לחישוב זמני שבת/חגים, ברירת מחדל: Jerusalem)
+├── reactwork-quiz-best:<רמה>          number (שיא ניקוד לכל רמת קושי בנפרד)
+├── reactwork-quiz-seen:<פרשה>:<רמה>   number[] (אינדקסים של שאלות שכבר נשאלו בפרשה+רמה זו)
+└── reactwork-reminder-seen            string (תאריך)
 ```
 
 **גישה:** `useDailyProgress()` הוא הוק משותף בין שלושת עמודי הלימוד — כך שסימון "נלמד"
 בכל אחד מהם משפיע על אותו רצף/ניקוד יחיד. חוץ מזה, כל עמוד מנהל את המצב שלו עם
 `useState` + `useEffect` לקריאה/כתיבה ב-`localStorage`. אין state management גלובלי.
+
+### ישויות מרכזיות (Core Entities)
+
+| ישות | שדות עיקריים | מקור |
+|---|---|---|
+| **יום לימוד (Daily Entry)** | `dayOfWeek`/`hebrewDayOfMonth`, `chumashRef`, `tehillimRef`, `tanyaRef`, `note` | `dailyContent.js` (מקומי) + Sefaria (רפרנס חי) |
+| **פרשה (Parasha)** | `name`, `book`, `date`, `aliyot[]` (טווח פסוקים לכל עלייה) | `parashaData.js` + Sefaria `extraDetails.aliyot` |
+| **שאלת חידון (Quiz Question)** | `q` (טקסט), `a` (4 אפשרויות), `correctIndex`, `parasha` | `parashaQuestions.js` |
+| **התקדמות (Progress)** | `completedDays: Set`, `history: string[]`, `streak`, `score`, `lastCompletedDate` | `useDailyProgress` ↔ `reactwork-daily-state` |
+| **הגדרות משתמש (Settings)** | `remindersOn`, `reminderTime`, `fontSize`, `theme`, `city` | `reactwork-settings` / `reactwork-city` |
 
 ### זרימת נתונים (Data Flow)
 

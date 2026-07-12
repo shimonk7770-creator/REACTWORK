@@ -253,3 +253,13 @@
 - [x] **23ח — מפת רצף שנתית**: `useDailyProgress.js` מוסיף שדה `history` (מערך תאריכי ISO, לא מתאפס כמו `completedDays`); `markDone` מוסיף את היום שסומן. `YearHeatmap.jsx` חדש מציג 364 הימים האחרונים בסגנון GitHub contributions, בעמוד ההגדרות.
   - **תיקון באג נלווה**: `dateStr` נבנה במקור עם `selectedDate.toISOString()` — ממיר ל-UTC ולכן "מזיז" תאריכים באזורי זמן חיוביים (ישראל UTC+3), מה שגרם לריבוע ה-heatmap להישאר ריק גם כשההיסטוריה הכילה את התאריך הנכון. תוקן ע"י `toLocalDateStr()` חדש ב-`hebrewDate.js` שבונה את המחרוזת מרכיבי תאריך מקומיים (`getFullYear/getMonth/getDate`), בשימוש גם ב-`markDone` וגם ב-`YearHeatmap`. אומת: יום שסומן כנלמד מופיע כריבוע ירוק במפה
 - [x] אימות כל סעיף ב-preview לפני commit; עדכון PRD.md/tasks.md/README.md
+
+## שלב 29 - ביקורת תיעוד שנייה: תיקון PRD.md ו-ARCHITECTURE.md שהתיישנו ✅
+
+**תוכנית (נכתב לפני ביצוע).** המשתמש שאל שוב אם כל דרישות ה-PRD/tasks/README קיימות באיכות, וגם אם צריך לעדכן קבצים נוספים (ARCHITECTURE.md, package-lock.json). בדיקה ישירה (לא רק הצהרה) מצאה 3 פערים אמיתיים:
+
+- [x] **פער 1**: סעיף "ניהול מצב" ב-PRD.md עודכן לסכמת ה-localStorage האמיתית — כולל `history`, `selectedDateISO`, `reactwork-city`, `fontSize`/`theme` ב-settings, וסיומות `:<רמה>` על מפתחות החידון
+- [x] **פער 2**: נוסף תת-סעיף "ישויות מרכזיות (Core Entities)" ב-PRD.md תחת "ארכיטקטורה" — טבלה של 5 ישויות (יום לימוד, פרשה, שאלת חידון, התקדמות, הגדרות משתמש) עם שדות ומקור
+- [x] **פער 3**: `ARCHITECTURE.md` נכתב מחדש במלואו — מבנה תיקיות, היררכיית קומפוננטים, ניהול מצב, זרימת נתונים, 5 אלגוריתמים מרכזיים ו-6 החלטות ארכיטקטוניות, הכול משקף את המצב בפועל (3 עמודי לימוד, Sefaria כמקור חי, PWA, מצב לילה/נגישות, heatmap). גם `README.md` קיבל קישור אליו בסעיף "תיעוד נוסף"
+- [x] `package-lock.json`/`package.json`: **נבדק ואינו צריך עדכון** — לא נוספה אף תלות npm חדשה מאז תחילת הסשן (PWA/dark-mode/heatmap/שבת כולם מומשו ללא ספריות חדשות, `@hebcal/core` כבר היה קיים). `git log -- package.json` מראה שהקובץ לא שונה מאז ה-commit הראשוני
+- [x] אימות: קריאה חוזרת של PRD.md/ARCHITECTURE.md/README.md אחרי העריכה — commit ופוש
