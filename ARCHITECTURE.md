@@ -234,6 +234,46 @@ main.jsx → navigator.serviceWorker.register('/sw.js')  (production בלבד)
 
 ---
 
+## מסע נתונים לדוגמה (End-to-End Trace)
+
+הסעיף הזה עוקב אחרי שני תרחישים אמיתיים, שורה-שורה בקוד בפועל — לא תיאור כללי — כדי שאפשר יהיה להסביר בדיוק מה קורה בכל קליק.
+
+### תרחיש א׳: משתמש פותח `/tehillim` ובוחר יום אחר בלוח
+
+1. **ניתוב**: `App.jsx` מרנדר `<Route path="/tehillim" element={<Tehillim />} />`.
+2. **טעינת מצב ראשונית** ([`Tehillim.jsx`](src/pages/Tehillim.jsx)): הקומפוננטה קוראת ל-`useDailyProgress()` ([`hooks/useDailyProgress.js`](src/hooks/useDailyProgress.js)). ה-hook קורא synchronously (ב-`useState` initializer, לא ב-`useEffect`) את `localStorage['reactwork-daily-state']` ומחלץ ממנו את `selectedDate` השמור (או "עכשיו" אם אין).
+3. **חישוב היום העברי**: `dayInfo = useMemo(() => getHebrewDayInfo(selectedDate), [selectedDate])` — קורא ל-[`utils/hebrewDate.js`](src/utils/hebrewDate.js), שבונה `HDate` מ-`@hebcal/core` ומחזיר `{ day, monthName, isCombinedDay, ... }`.
+4. **תצוגה**: `Tehillim.jsx` ממפה את `dayInfo.days` (1 או 2 ימים, אם חודש חסר) מול `dailyContent.js` ומקבל את `entry.tehillimRef` המתאים (למשל `"Psalms.120-134"`), ומעביר אותו ל-`<TextViewer sefariaRef={entry.tehillimRef} autoOpen />`.
+5. **שליפת טקסט**: [`TextViewer.jsx`](src/components/TextViewer.jsx) מריץ `fetch` ל-`https://www.sefaria.org/api/texts/{ref}`, ומפרסר את התגובה ב-`parseResponse` (כולל הטיפול המיוחד במקרה ש-`data.he` הוא מחרוזת בודדת ולא מערך — ר' "מגבלות" ב-README).
+6. **בחירת יום אחר**: המשתמש לוחץ על תא בלוח ([`HebrewCalendarGrid.jsx`](src/components/HebrewCalendarGrid.jsx) שורה 123: `onClick={() => onSelectDay(hdate.getDate(), date)}`). ה-prop `onSelectDay` שהועבר מ-`Tehillim.jsx` הוא `(_heDay, date) => selectDate(date)`, כלומר קורא ל-`selectDate` שמוחזר מ-`useDailyProgress()`.
+7. **עדכון מצב**: `selectDate(date)` קורא ל-`setSelectedDate(date)`. React מרנדר מחדש; `dayInfo` (שלב 3) מחושב מחדש עבור התאריך החדש; ה-`TextViewer` מקבל `sefariaRef` חדש, ה-`useEffect` שלו (שתלוי ב-`sefariaRef`) מתאפס וטוען מחדש.
+8. **שמירה**: `useEffect` נפרד ב-`useDailyProgress` (תלוי ב-`selectedDate` ועוד) כותב את המצב המעודכן בחזרה ל-`localStorage['reactwork-daily-state'].selectedDateISO` — כך שגם `/chumash` ו-`/tanya` (שקוראים לאותו hook) "יזכרו" את היום שנבחר.
+
+### תרחיש ב׳: משתמש לוחץ "סמן כנלמד היום"
+
+1. הכפתור ב-[`ProgressWidget.jsx`](src/components/ProgressWidget.jsx) (`<button onClick={markDone}>`) קורא ל-`markDone` מתוך `useDailyProgress()`.
+2. **בתוך `markDone`** ([`hooks/useDailyProgress.js`](src/hooks/useDailyProgress.js)): אם היום כבר מסומן (`completed === true`) — יוצא מיד (guard בתחילת הפונקציה), אין כפל ניקוד.
+3. מוסיף את `dayInfo.day` ל-`completedDays` (`Set`) — זה מה שמפעיל את הריבוע הירוק בלוח החודשי.
+4. מחשב `dateStr = toLocalDateStr(selectedDate)` (תאריך מקומי, לא UTC — ר' "שגיאות ותיקונים" למטה) ומוסיף אותו ל-`history[]` אם לא קיים שם כבר — זה מה שמזין את `YearHeatmap` בהגדרות.
+5. מחשב רצף: אם `lastCompletedDate === אתמול` → `streak+1`, אחרת מאפס ל-1. בודק אם `newStreak` פוגע במיילסטון (7/14/21/30) ומוסיף בונוס ניקוד בהתאם.
+6. מפעיל שלושה `setTimeout` לניקוי דגלי אנימציה (`justCompleted`, `scoreAnim`, `streakAnim`) — אלה קובעים אילו קלאסים CSS (`completedPulse`, `scoreBump`, `streakBounce`) יתווספו זמנית ל-DOM כדי ליצור את אפקט ה"ניצוץ".
+7. React מרנדר מחדש; ה-`useEffect` ששומר state כותב הכול בחזרה ל-`localStorage['reactwork-daily-state']` (כולל `completedDays`, `streak`, `score`, `history`).
+8. מכיוון ש-`Chumash.jsx`/`Tehillim.jsx`/`Tanya.jsx` כולם קוראים לאותו `useDailyProgress()`, הרצף/ניקוד המעודכן משותף ומיידי גם בעמודים האחרים בפעם הבאה שהם נטענים — אין state גלובלי, רק `localStorage` משותף.
+
+### איך מוסיפים תכונה חדשה — הדגמה: מקור תוכן רביעי ("הלכה יומית")
+
+כדי להראות שהמבנה הקיים מובן מספיק כדי להרחיב אותו (לא רק לתחזק אותו), הנה בדיוק אילו קבצים היו נוצרים/משתנים כדי להוסיף עמוד "הלכה יומית" רביעי, לפי אותה תבנית ש-חומש/תהילים/תניא כבר משתמשים בה:
+
+1. **`src/data/dailyContent.js`** — להוסיף שדה `halachaRef` (רפרנס Sefaria/מקומי) לכל אחת מ-30 הרשומות הקיימות, בדיוק כמו `tehillimRef`/`tanyaRef`.
+2. **`src/pages/Halacha.jsx`** (חדש) — עותק כמעט זהה ל-`Tehillim.jsx`: קריאה ל-`useDailyProgress()` (**אותו hook** — אין צורך ליצור state נפרד, הרצף/ניקוד כבר משותף), `HebrewCalendarGrid` לבחירת יום, `TextViewer` עם `sefariaRef={entry.halachaRef}`, `ProgressWidget` בתחתית.
+3. **`src/App.jsx`** — הוספת שורה אחת ל-`<Routes>` (`<Route path="/halacha" element={<Halacha />} />`) ולינק בניווט (`Header`/`Nav`) ובתפריט ההמבורגר.
+4. **`src/pages/Home.jsx`** — כרטיס רביעי בגריד "מה לומדים היום" ו-`article` נוסף בגריד ה-features, לפי אותו pattern שכבר קיים ל-3 האחרים.
+5. **`src/index.css`** — קלאס `.subject-hero.halacha` עם צבע ייחודי (כמו `.subject-hero.tehillim`).
+
+שום שינוי לא נדרש ב-`useDailyProgress`, ב-localStorage schema, או בלוגיקת הרצף/ניקוד — זו בדיוק הסיבה שהוחלט לחלץ אותם ל-hook משותף בשלב 20 (ר' "החלטה ארכיטקטונית #4" למטה): כל עמוד לימוד חדש "נכנס" למערכת הרצף/ניקוד בחינם.
+
+---
+
 ## עיצוב (Design System)
 
 כל הסגנונות ב-`src/index.css` (קובץ יחיד, ללא CSS Modules):
