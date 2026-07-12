@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, NavLink, Link } from 'react-router-dom';
+import { Routes, Route, NavLink, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Chumash from './pages/Chumash.jsx';
 import Tehillim from './pages/Tehillim.jsx';
@@ -10,6 +10,10 @@ import NotFound from './pages/NotFound.jsx';
 
 function App() {
   const [reminderVisible, setReminderVisible] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => { setNavOpen(false); }, [location.pathname]);
 
   useEffect(() => {
     const settings = JSON.parse(localStorage.getItem('reactwork-settings') || '{}');
@@ -51,7 +55,16 @@ function App() {
           <span className="brand-name">חת״ת יומי</span>
         </Link>
 
-        <nav className="app-nav">
+        <button
+          className={`nav-toggle${navOpen ? ' open' : ''}`}
+          onClick={() => setNavOpen((o) => !o)}
+          aria-label="תפריט ניווט"
+          aria-expanded={navOpen}
+        >
+          <span /><span /><span />
+        </button>
+
+        <nav className={`app-nav${navOpen ? ' open' : ''}`}>
           <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>בית</NavLink>
           <NavLink to="/chumash" className={({ isActive }) => (isActive ? 'active' : '')}>חומש</NavLink>
           <NavLink to="/tehillim" className={({ isActive }) => (isActive ? 'active' : '')}>תהילים</NavLink>
