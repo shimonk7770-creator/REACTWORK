@@ -2,6 +2,11 @@
   "name": "reactwork",
   "private": true,
   "version": "0.1.0",
+  "description": "חת״ת יומי — אפליקציית React ללימוד יומי של חומש, תהילים ותניא, עם ניקוד רצף, חידון פרשת השבוע ותזכורות",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shimonk7770-creator/REACTWORK"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
