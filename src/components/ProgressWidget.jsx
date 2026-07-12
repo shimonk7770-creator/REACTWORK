@@ -13,6 +13,14 @@ function ProgressWidget({ progress, doneLabel = 'סמן כנלמד' }) {
     }
   };
 
+  const shareStreak = () => {
+    const text = streak > 0
+      ? `אני ברצף של ${streak} ימי לימוד חת"ת (חומש, תהילים ותניא)! 🔥📖 בואו תצטרפו גם אתם.`
+      : 'מתחיל/ה ללמוד חת"ת (חומש, תהילים ותניא) כל יום — בואו תצטרפו! 📖';
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <article className="card stats-card-compact">
       {milestoneAlert && (
@@ -64,6 +72,9 @@ function ProgressWidget({ progress, doneLabel = 'סמן כנלמד' }) {
           </button>
           <button className="secondary" onClick={handleReset}>
             איפוס
+          </button>
+          <button className="secondary share-btn" onClick={shareStreak}>
+            שיתוף 📤
           </button>
         </div>
       </div>

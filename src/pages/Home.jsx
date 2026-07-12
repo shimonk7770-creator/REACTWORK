@@ -4,6 +4,7 @@ import { chumashByDayOfWeek, dailyContent } from '../data/dailyContent.js';
 import { getCurrentParasha } from '../data/parashaData.js';
 import { getHebrewDayInfo } from '../utils/hebrewDate.js';
 import { getUpcomingShabbat, loadCityName } from '../utils/shabbatTimes.js';
+import { getTodaysThought } from '../data/dailyThoughts.js';
 
 const DOW_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
@@ -43,6 +44,11 @@ function Home() {
           <Link to="/tanya" className="subject-btn tanya">📕 התחל ללמוד תניא</Link>
           <Link to="/quiz" className="subject-btn quiz">🧠 חידון פרשה</Link>
         </div>
+      </div>
+
+      <div className="card daily-thought-card">
+        <span className="thought-mark">״</span>
+        <p>{getTodaysThought(today)}</p>
       </div>
 
       <div className="card today-glance-card">

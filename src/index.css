@@ -382,6 +382,29 @@ button, input, select { font: inherit; }
 
 .today-glance-card { animation: fadeInUp 0.4s 0.08s ease both; }
 
+.daily-thought-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  background: linear-gradient(135deg, rgba(139, 111, 216, 0.1), rgba(245, 166, 35, 0.08));
+  animation: fadeInUp 0.4s 0.02s ease both;
+}
+.daily-thought-card p {
+  margin: 0;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.thought-mark {
+  font-size: 2.4rem;
+  color: var(--purple);
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
 /* Video card (home) */
 .video-card { padding: 24px; }
 .video-embed-wrap {
@@ -505,6 +528,7 @@ button, input, select { font: inherit; }
 .next-milestone-compact p { margin: 2px 0 0; font-size: 0.85rem; color: var(--text-soft); }
 
 .control-row-compact { margin-top: 0; flex-wrap: nowrap; }
+.share-btn:hover { background: rgba(47, 168, 118, 0.16); border-color: rgba(47, 168, 118, 0.35); color: #1a6b48; }
 
 /* ─── Content list ─── */
 .content-list {
