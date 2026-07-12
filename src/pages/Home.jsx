@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { chumashByDayOfWeek, dailyContent } from '../data/dailyContent.js';
 import { getCurrentParasha } from '../data/parashaData.js';
 import { getHebrewDayInfo } from '../utils/hebrewDate.js';
+import { getUpcomingShabbat, loadCityName } from '../utils/shabbatTimes.js';
+
+const DOW_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
 function Home() {
   useEffect(() => { document.title = 'חת"ת יומי'; }, []);
@@ -14,6 +17,11 @@ function Home() {
   const entries = dayInfo.days
     .map((d) => dailyContent.find((item) => item.day === d))
     .filter(Boolean);
+
+  const [shabbat, setShabbat] = useState(null);
+  useEffect(() => {
+    try { setShabbat(getUpcomingShabbat(loadCityName())); } catch { setShabbat(null); }
+  }, []);
 
   return (
     <section>
@@ -55,6 +63,35 @@ function Home() {
           </div>
         </div>
       </div>
+
+      {shabbat && (shabbat.candleLighting || shabbat.havdalah) && (
+        <div className="card accent-card accent-gold">
+          <span className="pill">🕯️ זמני שבת — {shabbat.cityHe}</span>
+          <h3>{shabbat.parashaHe ? `פרשת ${shabbat.parashaHe}` : 'שבת קרובה'}</h3>
+          <div className="chitas-grid">
+            {shabbat.candleLighting && (
+              <div className="chitas-item">
+                <span className="label">🕯️ כניסת שבת</span>
+                <p>יום {DOW_HE[shabbat.candleLighting.date.getDay()]} · {shabbat.candleLighting.time}</p>
+              </div>
+            )}
+            {shabbat.havdalah && (
+              <div className="chitas-item">
+                <span className="label">✨ יציאת שבת</span>
+                <p>יום {DOW_HE[shabbat.havdalah.date.getDay()]} · {shabbat.havdalah.time}</p>
+              </div>
+            )}
+          </div>
+          {shabbat.upcoming.length > 0 && (
+            <p className="text-soft" style={{ fontSize: '0.85rem', marginTop: '12px' }}>
+              בקרוב: {shabbat.upcoming.map((u) => u.title).join(' · ')}
+            </p>
+          )}
+          <p className="text-soft" style={{ fontSize: '0.8rem', marginTop: '8px' }}>
+            ניתן לשנות עיר ב<Link to="/settings" className="text-viewer-link">הגדרות</Link>.
+          </p>
+        </div>
+      )}
 
       <div className="card video-card">
         <span className="pill">🎬 סרטון היום</span>

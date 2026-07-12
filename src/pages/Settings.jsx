@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Location } from '@hebcal/core';
 import { applyFontSize } from '../utils/fontSize.js';
 import { applyTheme, loadTheme } from '../utils/theme.js';
+import { loadCityName, saveCityName } from '../utils/shabbatTimes.js';
 
 const SETTINGS_KEY = 'reactwork-settings';
 const DAILY_KEY = 'reactwork-daily-state';
@@ -21,10 +23,13 @@ function Settings() {
   const [reminderTime, setReminderTime] = useState('08:00');
   const [fontSize, setFontSize] = useState('normal');
   const [theme, setTheme] = useState('light');
+  const [cityInput, setCityInput] = useState('Jerusalem');
+  const [cityError, setCityError] = useState(false);
   const [stats, setStats] = useState({ streak: 0, score: 0, completedDays: 0, quizBest: 0 });
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    setCityInput(loadCityName());
     const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
     if (s.remindersOn !== undefined) setRemindersOn(s.remindersOn);
     if (s.reminderTime) setReminderTime(s.reminderTime);
@@ -56,6 +61,16 @@ function Settings() {
     applyTheme(value);
     const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...s, theme: value }));
+  };
+
+  const saveCity = () => {
+    const found = Location.lookup(cityInput.trim());
+    if (!found) {
+      setCityError(true);
+      return;
+    }
+    setCityError(false);
+    saveCityName(cityInput.trim());
   };
 
   const changeFontSize = (size) => {
@@ -143,6 +158,24 @@ function Settings() {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="card accent-card accent-teal">
+        <h3>🕯️ עיר לזמני שבת</h3>
+        <p className="text-soft">
+          זמני כניסת/יציאת שבת בדף הבית מחושבים לפי עיר זו (שם עיר באנגלית, למשל Jerusalem / Tel Aviv / New York).
+        </p>
+        <div className="control-row" style={{ marginTop: '10px' }}>
+          <input
+            type="text"
+            dir="ltr"
+            value={cityInput}
+            onChange={(e) => { setCityInput(e.target.value); setCityError(false); }}
+            style={{ flex: 1, minWidth: '160px', padding: '11px 16px', borderRadius: '14px', border: '1px solid var(--border-2)', background: 'rgba(255,255,255,0.6)', color: 'var(--text)' }}
+          />
+          <button className="secondary" onClick={saveCity}>שמור עיר</button>
+        </div>
+        {cityError && <p className="text-soft" style={{ color: 'var(--red)', marginTop: '8px' }}>עיר לא נמצאה — נסו שם באנגלית.</p>}
       </div>
 
       <div className="card accent-card accent-red">
