@@ -1,0 +1,21 @@
+{
+  "name": "חת\"ת יומי",
+  "short_name": "חת\"ת יומי",
+  "description": "לימוד יומי של חומש, תהילים ותניא — מסונכרן ליום העברי",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8f7fd",
+  "theme_color": "#8b6fd8",
+  "dir": "rtl",
+  "lang": "he",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
