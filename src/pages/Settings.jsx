@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { applyFontSize } from '../utils/fontSize.js';
+import { applyTheme, loadTheme } from '../utils/theme.js';
 
 const SETTINGS_KEY = 'reactwork-settings';
 const DAILY_KEY = 'reactwork-daily-state';
@@ -9,12 +10,17 @@ const FONT_SIZES = [
   { value: 'large',  label: 'גדול' },
   { value: 'xlarge', label: 'גדול מאוד' },
 ];
+const THEMES = [
+  { value: 'light', label: '☀️ בהיר' },
+  { value: 'dark',  label: '🌙 כהה' },
+];
 
 function Settings() {
   useEffect(() => { document.title = 'הגדרות | חת"ת יומי'; }, []);
   const [remindersOn, setRemindersOn] = useState(false);
   const [reminderTime, setReminderTime] = useState('08:00');
   const [fontSize, setFontSize] = useState('normal');
+  const [theme, setTheme] = useState('light');
   const [stats, setStats] = useState({ streak: 0, score: 0, completedDays: 0, quizBest: 0 });
   const [saved, setSaved] = useState(false);
 
@@ -23,6 +29,7 @@ function Settings() {
     if (s.remindersOn !== undefined) setRemindersOn(s.remindersOn);
     if (s.reminderTime) setReminderTime(s.reminderTime);
     if (s.fontSize) setFontSize(s.fontSize);
+    setTheme(loadTheme());
 
     const d = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
     const quizBest = QUIZ_DIFFICULTIES.reduce((sum, level) => {
@@ -42,6 +49,13 @@ function Settings() {
     localStorage.removeItem('reactwork-reminder-seen');
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const changeTheme = (value) => {
+    setTheme(value);
+    applyTheme(value);
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...s, theme: value }));
   };
 
   const changeFontSize = (size) => {
@@ -134,7 +148,21 @@ function Settings() {
       <div className="card accent-card accent-red">
         <h3>♿ התאמה אישית</h3>
         <p className="text-soft">התאימו את התצוגה לצרכים שלכם.</p>
-        <span className="small-label" style={{ marginTop: '14px', display: 'block' }}>גודל גופן</span>
+
+        <span className="small-label" style={{ marginTop: '14px', display: 'block' }}>ערכת נושא</span>
+        <div className="option-pill-row">
+          {THEMES.map((t) => (
+            <button
+              key={t.value}
+              className={`option-pill${theme === t.value ? ' active' : ''}`}
+              onClick={() => changeTheme(t.value)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <span className="small-label" style={{ marginTop: '18px', display: 'block' }}>גודל גופן</span>
         <div className="option-pill-row">
           {FONT_SIZES.map((f) => (
             <button

@@ -8,6 +8,7 @@ import Quiz from './pages/Quiz.jsx';
 import Settings from './pages/Settings.jsx';
 import NotFound from './pages/NotFound.jsx';
 import { applyFontSize, loadFontSize } from './utils/fontSize.js';
+import { applyTheme, loadTheme } from './utils/theme.js';
 
 function App() {
   const [reminderVisible, setReminderVisible] = useState(false);
@@ -17,6 +18,7 @@ function App() {
   useEffect(() => { setNavOpen(false); }, [location.pathname]);
 
   useEffect(() => { applyFontSize(loadFontSize()); }, []);
+  useEffect(() => { applyTheme(loadTheme()); }, []);
 
   useEffect(() => {
     const settings = JSON.parse(localStorage.getItem('reactwork-settings') || '{}');

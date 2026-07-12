@@ -43,6 +43,59 @@
 :root[data-font-size='large']  { font-size: 18px; }
 :root[data-font-size='xlarge'] { font-size: 20px; }
 
+/* ─── מצב לילה (Dark Mode) — נשלט מעמוד ההגדרות ─── */
+:root[data-theme='dark'] {
+  --gold:        #ffbd4b;
+  --gold-dim:    rgba(255, 189, 75, 0.18);
+  --gold-soft:   #ffe0a3;
+  --green:       #6eaf5e;
+  --green-dim:   rgba(110, 175, 94, 0.18);
+  --red:         #e07b7b;
+  --red-dim:     rgba(220, 90, 90, 0.2);
+  --purple:      #a78bfa;
+  --purple-dim:  rgba(167, 139, 250, 0.18);
+  --blue:        #6fb1f0;
+  --blue-dim:    rgba(111, 177, 240, 0.18);
+  --teal:        #4fd1c5;
+  --teal-dim:    rgba(79, 209, 197, 0.18);
+
+  --bg-0:        #060b16;
+  --bg-1:        #0c1526;
+  --bg-2:        #10192c;
+  --glass:       rgba(255, 255, 255, 0.05);
+  --glass-2:     rgba(255, 255, 255, 0.08);
+  --border:      rgba(255, 255, 255, 0.09);
+  --border-2:    rgba(255, 255, 255, 0.16);
+  --tint-1:      rgba(255, 255, 255, 0.05);
+  --tint-2:      rgba(255, 255, 255, 0.09);
+  --tint-3:      rgba(255, 255, 255, 0.16);
+  --text:        #f0ece4;
+  --text-soft:   #b9c3d6;
+  --text-dim:    #7d8aa3;
+  --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] body {
+  background:
+    radial-gradient(ellipse 70% 50% at 8% -5%,   rgba(139, 111, 216, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 45% at 92% 8%,   rgba(63, 143, 219, 0.18)  0%, transparent 58%),
+    radial-gradient(ellipse 65% 50% at 85% 100%, rgba(245, 166, 35, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 45% at 5% 100%,  rgba(47, 168, 118, 0.12) 0%, transparent 55%),
+    linear-gradient(180deg, #060b16 0%, #0a0f1c 100%);
+}
+
+:root[data-theme='dark'] .app-header  { background: rgba(6, 11, 22, 0.82); }
+:root[data-theme='dark'] .app-nav     { background: rgba(10, 15, 28, 0.97); }
+:root[data-theme='dark'] footer.app-footer   { background: rgba(0, 0, 0, 0.25); }
+:root[data-theme='dark'] .text-viewer-panel  { background: rgba(0, 0, 0, 0.25); }
+:root[data-theme='dark'] .quiz-option        { background: rgba(255, 255, 255, 0.045); }
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] input[type='number'],
+:root[data-theme='dark'] input[type='time']  { background: rgba(255, 255, 255, 0.06); }
+:root[data-theme='dark'] .option-pill        { background: rgba(255, 255, 255, 0.05); }
+
 * { box-sizing: border-box; }
 
 /* ─── Background — soft animated colorful gradient ─── */
