@@ -5,15 +5,25 @@ import HebrewCalendarGrid from '../components/HebrewCalendarGrid.jsx';
 import ProgressWidget from '../components/ProgressWidget.jsx';
 import TextViewer from '../components/TextViewer.jsx';
 
-const stripTags = (s) => s.replace(/<[^>]*>/g, '').trim();
+async function fetchTanyaYomiRef(y, m, d) {
+  const res = await fetch(`https://www.sefaria.org/api/calendars?year=${y}&month=${m}&day=${d}`);
+  const data = await res.json();
+  const item = data.calendar_items?.find((c) => c.title?.en === 'Tanya Yomi');
+  return item || null;
+}
 
-// מרכך את שדה he שמחזירה Sefaria (מחרוזת בודדת / מערך / מערך מקונן)
-// למחרוזת טקסט אחת נטולת תגיות, כדי לבדוק את אורכו בפועל.
-function flattenHe(he) {
-  if (!he) return '';
-  if (typeof he === 'string') return stripTags(he);
-  const flat = Array.isArray(he[0]) ? he.flat() : he;
-  return flat.map(stripTags).join(' ');
+// Sefaria מחזירה רק את פסוק ההתחלה של כל יום, לא טווח. הטווח האמיתי
+// של אותו יום הוא מפסוק ההתחלה שלו עד ועד בכלל פסוק ההתחלה של המחר
+// (אומת ישירות מול he.chabad.org — כולל מקרים שבהם היום חוצה לאיגרת
+// חדשה). בונים רפרנס-טווח משילוב שני הפסוקים.
+function buildDayRangeRef(todayRef, tomorrowRef) {
+  const m1 = todayRef.match(/^(.+?)\s+(\d+):(\d+)$/);
+  const m2 = tomorrowRef?.match(/^(.+?)\s+(\d+):(\d+)$/);
+  if (!m1) return todayRef;
+  if (!m2 || m1[1] !== m2[1]) return todayRef; // אין מחר בטווח, או שעברנו לאיגרת/חלק אחר לגמרי
+  const [, prefix, c1, v1] = m1;
+  const [, , c2, v2] = m2;
+  return `${prefix} ${c1}:${v1}-${c2}:${v2}`;
 }
 
 function Tanya() {
@@ -33,33 +43,20 @@ function Tanya() {
     const y = selectedDate.getFullYear();
     const m = selectedDate.getMonth() + 1;
     const d = selectedDate.getDate();
+    const tomorrow = new Date(selectedDate);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     let cancelled = false;
     setTanyaYomi(null);
     setTanyaError(false);
 
     (async () => {
       try {
-        const calRes = await fetch(`https://www.sefaria.org/api/calendars?year=${y}&month=${m}&day=${d}`);
-        const calData = await calRes.json();
-        const item = calData.calendar_items?.find((c) => c.title?.en === 'Tanya Yomi');
+        const [item, nextItem] = await Promise.all([
+          fetchTanyaYomiRef(y, m, d),
+          fetchTanyaYomiRef(tomorrow.getFullYear(), tomorrow.getMonth() + 1, tomorrow.getDate()),
+        ]);
         if (!item) throw new Error('no tanya item');
-
-        // בחלק מהימים (בעיקר איגרות הקודש) הרפרנס שמחזירה Sefaria מצביע
-        // על פסוק בודד שהוא בפועל רק כותרת/הערה היסטורית קצרה שמקדימה
-        // את האיגרת (למשל "אחר ביאתו מפטרבורג"), לא תוכן השיעור עצמו.
-        // אם הטקסט שחוזר קצר באופן חריג, מרחיבים לרפרנס הפרק/האיגרת
-        // השלמה (מסירים את ה-":מספר") במקום.
-        let effectiveRef = item.ref;
-        const singleVerse = /:\d+$/.test(item.ref);
-        if (singleVerse) {
-          const textRes = await fetch(
-            `https://www.sefaria.org/api/texts/${encodeURIComponent(item.ref)}?lang=he&context=0&sheets=0`
-          );
-          const textData = await textRes.json();
-          const flat = flattenHe(textData.he);
-          if (flat.length < 80) effectiveRef = item.ref.replace(/:\d+$/, '');
-        }
-
+        const effectiveRef = buildDayRangeRef(item.ref, nextItem?.ref);
         if (!cancelled) setTanyaYomi({ ...item, ref: effectiveRef });
       } catch {
         if (!cancelled) setTanyaError(true);
