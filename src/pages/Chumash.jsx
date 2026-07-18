@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { chumashByDayOfWeek } from '../data/dailyContent.js';
-import { getCurrentParasha } from '../data/parashaData.js';
 import { useDailyProgress } from '../hooks/useDailyProgress.js';
 import HebrewCalendarGrid from '../components/HebrewCalendarGrid.jsx';
 import ProgressWidget from '../components/ProgressWidget.jsx';
@@ -35,26 +34,41 @@ function refForDayOfWeek(calendarItem, dayOfWeek) {
   return aliyot[dayOfWeek];
 }
 
+const BOOK_HE = {
+  Genesis: 'בראשית', Exodus: 'שמות', Leviticus: 'ויקרא',
+  Numbers: 'במדבר', Deuteronomy: 'דברים',
+};
+function bookNameFromRef(ref) {
+  return BOOK_HE[ref?.split(' ')[0]] || '';
+}
+
 function Chumash() {
   const progress = useDailyProgress();
-  const { dayInfo, dayOfWeek, selectDate, isToday, completedDays, completed, justCompleted } = progress;
+  const { dayInfo, dayOfWeek, selectedDate, selectDate, isToday, completedDays, completed, justCompleted } = progress;
 
   const [calendarItem, setCalendarItem] = useState(null);
 
   useEffect(() => { document.title = 'חומש | חת"ת יומי'; }, []);
 
+  // שולפים את לוח השנה של Sefaria **לפי היום שנבחר בפועל** (לא תמיד "היום") —
+  // כך ששבוע אחר בלוח מציג את הפרשה הנכונה שלו, לא תמיד פרשת השבוע הנוכחית.
   useEffect(() => {
-    fetch('https://www.sefaria.org/api/calendars')
+    const y = selectedDate.getFullYear();
+    const m = selectedDate.getMonth() + 1;
+    const d = selectedDate.getDate();
+    setCalendarItem(null);
+    fetch(`https://www.sefaria.org/api/calendars?year=${y}&month=${m}&day=${d}`)
       .then((r) => r.json())
       .then((data) => {
         const item = data.calendar_items?.find((c) => c.title?.en === 'Parashat Hashavua');
         if (item) setCalendarItem(item);
       })
       .catch(() => {});
-  }, []);
+  }, [selectedDate]);
 
   const chumash = chumashByDayOfWeek[dayOfWeek];
-  const parasha = getCurrentParasha();
+  const parashaName = calendarItem?.displayValue?.he;
+  const parashaBook = bookNameFromRef(calendarItem?.ref);
   const dayRef = refForDayOfWeek(calendarItem, dayOfWeek);
 
   return (
@@ -68,9 +82,10 @@ function Chumash() {
       <div className={`card page-intro-card subject-hero chumash${justCompleted ? ' just-completed' : ''}`}>
         <div>
           <span className="pill">📜 חומש</span>
-          <h2>פרשת {parasha.name}</h2>
+          <h2>{parashaName ? `פרשת ${parashaName}` : '⏳ טוען פרשת השבוע...'}</h2>
           <p>
-            {isToday ? 'היום' : `יום ${DAY_NAMES[dayOfWeek]}`} · {chumash.label} · ספר {parasha.book}
+            {isToday ? 'היום' : `יום ${DAY_NAMES[dayOfWeek]}`} · {chumash.label}
+            {parashaBook ? ` · ספר ${parashaBook}` : ''}
           </p>
         </div>
         <div className="summary-badge">
@@ -92,7 +107,7 @@ function Chumash() {
       <ProgressWidget progress={progress} doneLabel="סמנתי כנלמד" />
 
       <div className="card notes-card">
-        <h3>הסבר לימוד — פרשת {parasha.name}</h3>
+        <h3>הסבר לימוד{parashaName ? ` — פרשת ${parashaName}` : ''}</h3>
         {calendarItem?.description?.he ? (
           <p>{calendarItem.description.he}</p>
         ) : (

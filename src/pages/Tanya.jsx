@@ -7,31 +7,38 @@ import TextViewer from '../components/TextViewer.jsx';
 
 function Tanya() {
   const progress = useDailyProgress();
-  const { dayInfo, selectDate, isToday, completedDays, completed, justCompleted } = progress;
+  const { dayInfo, selectedDate, selectDate, isToday, completedDays, completed, justCompleted } = progress;
 
   const [tanyaYomi, setTanyaYomi] = useState(null);
+  const [tanyaError, setTanyaError] = useState(false);
 
   useEffect(() => { document.title = 'תניא | חת"ת יומי'; }, []);
 
-  // "תניא יומי" האמיתי מ-Sefaria — מחזור שנתי מדויק (לא-אחיד), שונה
-  // מהמיפוי המקומי המקורב שמבוסס על 30 עמדות קבועות בחודש
+  // "תניא יומי" האמיתי מ-Sefaria — נשלף **לפי היום שנבחר בפועל** (לא רק
+  // "היום"), כך שכל תאריך בלוח מציג את שיעור התניא המדויק שלו, בדיוק
+  // כמו תהילים. המיפוי המקומי המקורב (dailyContent.js) משמש רק אם הבקשה
+  // נכשלת (למשל אין רשת).
   useEffect(() => {
-    fetch('https://www.sefaria.org/api/calendars')
+    const y = selectedDate.getFullYear();
+    const m = selectedDate.getMonth() + 1;
+    const d = selectedDate.getDate();
+    setTanyaYomi(null);
+    setTanyaError(false);
+    fetch(`https://www.sefaria.org/api/calendars?year=${y}&month=${m}&day=${d}`)
       .then((r) => r.json())
       .then((data) => {
         const item = data.calendar_items?.find((c) => c.title?.en === 'Tanya Yomi');
         if (item) setTanyaYomi(item);
+        else setTanyaError(true);
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => setTanyaError(true));
+  }, [selectedDate]);
 
   const entries = dayInfo.days
     .map((d) => dailyContent.find((item) => item.day === d))
     .filter(Boolean);
 
-  // עבור "היום" משתמשים ברפרנס האמיתי מ-Sefaria; עבור יום אחר שנבחר
-  // בלוח — חוזרים למיפוי המקומי המקורב
-  const useLiveToday = isToday && tanyaYomi;
+  const useLive = !!tanyaYomi;
 
   return (
     <section>
@@ -59,23 +66,25 @@ function Tanya() {
 
       <article className="card today-card">
         <h3>שיעור היום</h3>
-        {useLiveToday ? (
+        {useLive ? (
           <div className="content-list">
-            <span className="label">תניא יומי — {tanyaYomi.ref}</span>
+            <span className="label">תניא יומי — {tanyaYomi.displayValue?.he || tanyaYomi.ref}</span>
             <TextViewer sefariaRef={tanyaYomi.ref} fallbackLabel="Sefaria.org" autoOpen />
           </div>
-        ) : (
+        ) : tanyaError ? (
           entries.map((entry) => (
             <div key={entry.day} className="content-list" style={{ marginBottom: '10px' }}>
               <span className="label">{entry.tanya}</span>
               <TextViewer sefariaRef={entry.tanyaRef} fallbackLabel="Sefaria.org" autoOpen />
             </div>
           ))
+        ) : (
+          <p className="text-viewer-status">⏳ טוען את שיעור התניא ליום זה...</p>
         )}
-        {!isToday && (
+        {tanyaError && (
           <p className="text-soft" style={{ fontSize: '0.85rem', marginTop: '10px' }}>
-            ℹ️ עבור ימים שאינם היום, התוכן מבוסס על מחזור חודשי מקורב — ליום הנוכחי מוצג הרפרנס
-            המדויק מלוח "תניא יומי" של Sefaria.
+            ℹ️ לא ניתן היה לטעון את לוח "תניא יומי" המדויק מ-Sefaria (למשל בעיית רשת) — מוצג במקום
+            מיפוי מקומי מקורב, לפי היום העברי בחודש.
           </p>
         )}
         {dayInfo.isCombinedDay && (
