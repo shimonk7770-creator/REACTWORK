@@ -31,7 +31,7 @@
 
 ## Tech Stack
 
-- **React 18** + **Vite 5** — UI ו-build tool
+- **React 18** + **Vite 6** — UI ו-build tool
 - **React Router v6** — ניווט client-side (SPA)
 - **@hebcal/core** — תאריך עברי (HDate), שמות חודשים, אירועים
 - **CSS3 ידני** — עיצוב RTL מלא, ערכת נושא בהירה וצבעונית, ללא ספריית UI
@@ -53,28 +53,39 @@ npm run dev
 ## מבנה הפרויקט
 
 ```
+public/
+├── manifest.json               # PWA manifest
+├── icon.svg                     # אייקון להתקנה
+└── sw.js                          # Service Worker — network-first, production בלבד
 src/
-├── App.jsx                    # Shell, ניווט, באנר תזכורת
-├── index.css                  # Global styles (RTL, ערכת נושא בהירה)
+├── main.jsx                    # ReactDOM.createRoot + BrowserRouter + רישום SW
+├── App.jsx                     # Shell, ניווט + תפריט המבורגר במובייל, באנר תזכורת
+├── index.css                   # Global styles (RTL, בהיר/כהה, רספונסיבי)
 ├── pages/
-│   ├── Home.jsx                # דף בית — כרטיסי נושא + סרטון פתיחה
-│   ├── Chumash.jsx              # עמוד חומש (לפי יום בשבוע)
+│   ├── Home.jsx                # דף בית — כרטיסי נושא + סרטון פתיחה + מחשבה יומית + זמני שבת
+│   ├── Chumash.jsx              # עמוד חומש (לפי יום בשבוע + שבוע נכון לפי תאריך נבחר)
 │   ├── Tehillim.jsx             # עמוד תהילים (לפי יום עברי בחודש)
-│   ├── Tanya.jsx                 # עמוד תניא (לפי יום עברי בחודש)
+│   ├── Tanya.jsx                 # עמוד תניא (Sefaria Tanya Yomi לכל יום נבחר)
 │   ├── Quiz.jsx                  # חידון + 10 שאלות + מעקב שאלות-שנשאלו
-│   └── Settings.jsx              # תזכורות + סטטיסטיקה
+│   ├── Settings.jsx              # תזכורות, עיר, נגישות, מצב לילה, מפת רצף שנתית
+│   └── NotFound.jsx               # דף 404
 ├── components/
 │   ├── HebrewCalendarGrid.jsx    # לוח שנה עברי לחיץ (משותף לשלושת עמודי הלימוד)
-│   ├── ProgressWidget.jsx        # כרטיס רצף/ניקוד משותף
-│   └── TextViewer.jsx            # טעינת טקסט מ-Sefaria API
+│   ├── ProgressWidget.jsx        # כרטיס רצף/ניקוד + שיתוף
+│   ├── TextViewer.jsx            # טעינת טקסט מ-Sefaria API
+│   └── YearHeatmap.jsx            # מפת רצף שנתית (GitHub-contributions style)
 ├── hooks/
-│   └── useDailyProgress.js       # הוק משותף: יום נבחר + רצף/ניקוד (מבוסס HDate)
+│   └── useDailyProgress.js       # הוק משותף: יום נבחר + רצף/ניקוד/היסטוריה (מבוסס HDate)
 ├── utils/
-│   └── hebrewDate.js             # getHebrewDayInfo() — יום עברי בחודש, כולל חודש חסר
+│   ├── hebrewDate.js             # getHebrewDayInfo(), toLocalDateStr() — כולל חודש חסר
+│   ├── fontSize.js                # שמירה/החלה של הגדלת גופן נגישה
+│   ├── theme.js                    # שמירה/החלה של מצב לילה
+│   └── shabbatTimes.js             # זמני כניסת/יציאת שבת לפי עיר
 └── data/
     ├── dailyContent.js           # תוכן: תהילים (30 יום עברי), תניא (30 יום עברי), חומש (7 ימים)
     ├── parashaData.js            # לוח פרשות ה׳תשפ״ו + getCurrentParasha()
-    └── parashaQuestions.js       # בנק שאלות לכל פרשה + טיפול בשבתות כפולות
+    ├── parashaQuestions.js       # בנק שאלות לכל פרשה + טיפול בשבתות כפולות
+    └── dailyThoughts.js           # 12 מחשבות יומיות מתחלפות
 ```
 
 ---
@@ -98,7 +109,7 @@ src/
 |---|---|---|
 | טקסט חומש/תהילים/תניא | [Sefaria API](https://www.sefaria.org/api) | `GET /api/texts/{ref}` — נטען לפי דרישה בכל עמוד לימוד |
 | פרשת השבוע + עליות מדויקות | Sefaria `GET /api/calendars` | `extraDetails.aliyot` נותן טווח פסוקים לכל עלייה (1–7) |
-| תניא יומי (ליום הנוכחי) | Sefaria `GET /api/calendars` | פריט הלוח `"Tanya Yomi"` נותן רפרנס מדויק ליום העברי הנוכחי |
+| תניא יומי (לכל יום נבחר) | Sefaria `GET /api/calendars` | פריט הלוח `"Tanya Yomi"` נשלף גם ליום הנבחר וגם למחרתו; הטווח המדויק = מפסוק ההתחלה של היום עד ועד בכלל פסוק ההתחלה של המחר (אומת מול he.chabad.org) |
 | תאריך עברי, שמות חודשים, אירועים | [`@hebcal/core`](https://www.npmjs.com/package/@hebcal/core) | ספריית JS מקומית, ללא קריאת רשת |
 | לוח פרשות שנתי (לכל השבתות) | נתון סטטי מקומי | `src/data/parashaData.js` — ידני לשנת ה׳תשפ״ו |
 | בנק שאלות חידון (~700) | abc770.org | הוקלד/יובא לנתון סטטי מקומי ב-`src/data/parashaQuestions.js` |
@@ -108,7 +119,7 @@ src/
 
 ## מגבלות ובאגים ידועים
 
-- **תניא ליום שאינו היום** — כשבוחרים יום אחר בלוח (לא היום הנוכחי), התוכן מבוסס על מיפוי מקומי מקורב של 30 עמדות בחודש, לא על הלוח השנתי המדויק של Sefaria "Tanya Yomi" (זמין רק ל"היום"). עבור היום הנוכחי מוצג תמיד הרפרנס המדויק.
+- **תניא — מקרי קצה נדירים בגבול איגרות** — התניא היומי מדויק לכל יום נבחר (לא רק "היום"), מחושב כטווח מ-Sefaria בין תחילת היום לתחילת המחר. במקרה נדיר אחד שאותר (תחילת איגרת קודש חדשה) התוכן עדיין לא תואם במדויק את he.chabad.org — לא בוצע תיקון בלי מקור מאומת. מיפוי מקומי מקורב (`dailyContent.js`) משמש רק כ-fallback אם הבקשה ל-Sefaria נכשלת (למשל אין רשת).
 - **תלות ברשת** — טעינת טקסטים דורשת חיבור לאינטרנט ותקינות של Sefaria API; במקרה של כשל מוצג קישור לפתיחה ישירה ב-Sefaria.org.
 - **אין שמירה בין מכשירים** — כל ההתקדמות נשמרת ב-`localStorage` בדפדפן הנוכחי בלבד (ר' "היקף / Out of scope" ב-[PRD.md](PRD.md)).
 - **לוח הפרשות** מוגדר ידנית לשנת ה׳תשפ״ו בלבד ודורש עדכון ידני לשנים הבאות.
