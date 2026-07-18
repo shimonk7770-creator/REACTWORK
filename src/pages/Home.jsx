@@ -43,6 +43,7 @@ function Home() {
           <Link to="/tehillim" className="subject-btn tehillim">📗 התחל ללמוד תהילים</Link>
           <Link to="/tanya" className="subject-btn tanya">📕 התחל ללמוד תניא</Link>
           <Link to="/quiz" className="subject-btn quiz">🧠 חידון פרשה</Link>
+          <Link to="/settings" className="subject-btn settings">⚙️ הגדרות</Link>
         </div>
       </div>
 

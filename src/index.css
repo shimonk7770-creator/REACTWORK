@@ -705,6 +705,7 @@ a.subject-btn.chumash  { background: linear-gradient(135deg, var(--blue), #2f6fb
 a.subject-btn.tehillim { background: linear-gradient(135deg, var(--purple), #6a4fc0); box-shadow: 0 8px 20px rgba(139, 111, 216, 0.32); }
 a.subject-btn.tanya    { background: linear-gradient(135deg, var(--teal), #187f7f); box-shadow: 0 8px 20px rgba(34, 163, 163, 0.32); }
 a.subject-btn.quiz     { background: linear-gradient(135deg, var(--red), #b83a52); box-shadow: 0 8px 20px rgba(226, 83, 107, 0.32); }
+a.subject-btn.settings { background: linear-gradient(135deg, var(--gold), #b8790f); box-shadow: 0 8px 20px rgba(245, 166, 35, 0.32); }
 a.subject-btn:hover { transform: translateY(-2px); }
 
 button.secondary:hover, a.secondary:hover {
