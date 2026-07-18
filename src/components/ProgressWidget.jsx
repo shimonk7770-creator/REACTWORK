@@ -4,12 +4,12 @@ function ProgressWidget({ progress, doneLabel = 'סמן כנלמד' }) {
     score, scoreAnim,
     completedDays, completed,
     nextMilestone, milestoneAlert, setMilestoneAlert,
-    markDone, resetProgress,
+    markDone, resetToday,
   } = progress;
 
   const handleReset = () => {
-    if (window.confirm('לאפס את כל הרצף, הניקוד והימים שסימנת? לא ניתן לבטל פעולה זו.')) {
-      resetProgress();
+    if (window.confirm('לבטל את הסימון של היום הנוכחי בלבד? שאר הימים שסימנת בחודש יישארו כמו שהם.')) {
+      resetToday();
     }
   };
 
@@ -70,7 +70,7 @@ function ProgressWidget({ progress, doneLabel = 'סמן כנלמד' }) {
           <button className="primary" onClick={markDone} disabled={completed}>
             {completed ? 'הושלם ✓' : doneLabel}
           </button>
-          <button className="secondary" onClick={handleReset}>
+          <button className="secondary" onClick={handleReset} disabled={!completed}>
             איפוס
           </button>
           <button className="secondary share-btn" onClick={shareStreak}>

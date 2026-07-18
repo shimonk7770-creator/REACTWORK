@@ -94,7 +94,7 @@ function Tanya() {
         )}
       </article>
 
-      <ProgressWidget progress={progress} doneLabel="סיימתי היום" />
+      <ProgressWidget progress={progress} doneLabel="סמנתי כנלמד" />
 
       <div className="card notes-card">
         <h3>הסבר לימוד</h3>

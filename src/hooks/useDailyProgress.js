@@ -18,6 +18,20 @@ function loadStoredState() {
   }
 }
 
+// מחשב רצף אמיתי (ימים רצופים) מתוך היסטוריית תאריכים, במקום סתם לאפס
+// ל-0 — נדרש אחרי הסרת יום בודד מההיסטוריה (resetToday).
+function computeStreakFromHistory(historyDates) {
+  if (!historyDates.length) return { streak: 0, lastCompletedDate: null };
+  const sorted = [...historyDates].sort();
+  let streak = 1;
+  for (let i = sorted.length - 1; i > 0; i--) {
+    const diffDays = Math.round((new Date(sorted[i]) - new Date(sorted[i - 1])) / 86_400_000);
+    if (diffDays === 1) streak++;
+    else break;
+  }
+  return { streak, lastCompletedDate: new Date(sorted[sorted.length - 1]).toDateString() };
+}
+
 // הוק משותף לניהול "יום נבחר" + רצף/ניקוד — משמש בכל עמודי
 // חומש/תהילים/תניא, כך ששלושתם מדברים על אותו יום ואותו רצף לימוד.
 // ה"יום" נגזר תמיד מהתאריך העברי (HDate), לא מהתאריך הלועזי.
@@ -97,13 +111,24 @@ export function useDailyProgress() {
     }
   };
 
-  const resetProgress = () => {
-    setCompletedDays(new Set());
-    setStreak(0);
-    setScore(0);
-    setLastCompletedDate(null);
+  // מבטל את הסימון של היום שנצפה כרגע בלבד — שאר הימים שסומנו בחודש/
+  // בהיסטוריה (ולכן גם מפת הרצף השנתית) נשארים ללא שינוי.
+  const resetToday = () => {
+    if (!completed) return;
+    const newSet = new Set(completedDays);
+    newSet.delete(dayInfo.day);
+    setCompletedDays(newSet);
+
+    const dateStr = toLocalDateStr(selectedDate);
+    const newHistory = history.filter((d) => d !== dateStr);
+    setHistory(newHistory);
+
+    const { streak: newStreak, lastCompletedDate: newLast } = computeStreakFromHistory(newHistory);
+    setStreak(newStreak);
+    setLastCompletedDate(newLast);
+
+    setScore((prev) => Math.max(0, prev - 10));
     setMilestoneAlert(null);
-    setHistory([]);
   };
 
   return {
@@ -115,6 +140,6 @@ export function useDailyProgress() {
     score, scoreAnim,
     justCompleted,
     nextMilestone, milestoneAlert, setMilestoneAlert,
-    markDone, resetProgress,
+    markDone, resetToday,
   };
 }
